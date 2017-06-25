@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "294407516823",
+    "firebase_url": "https://cameandwentv3.firebaseio.com",
+    "project_id": "cameandwentv3",
+    "storage_bucket": "cameandwentv3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:294407516823:android:690109fd131dff8c",
+        "android_client_info": {
+          "package_name": "com.tokko.cameandwentv3"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "294407516823-r8d9mtjppapf66gdb3a7qovc2p47k2h7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tokko.cameandwentv3",
+            "certificate_hash": "9aaa9bf8eb83b6e99aceed6a5fb7aece64ec5600"
+          }
+        },
+        {
+          "client_id": "294407516823-m1d88v71t00kcmngb55nrnf2e9uikdg8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBXfa9HdbtzYLxpPGwpor4T0DHwPD6xPFQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "294407516823-m1d88v71t00kcmngb55nrnf2e9uikdg8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
