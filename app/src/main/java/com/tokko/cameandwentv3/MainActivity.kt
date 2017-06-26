@@ -3,9 +3,15 @@ package com.tokko.cameandwentv3
 import android.app.ListFragment
 import android.os.AsyncTask
 import android.os.Bundle
+import android.renderscript.Sampler
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.ArrayAdapter
+import android.widget.Toast
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import java.util.*
 
 /**
@@ -25,7 +31,21 @@ class DummyListFragment : ListFragment() {
         super.onViewCreated(view, savedInstanceState)
         val adapter = ArrayAdapter<String>(activity, android.R.layout.simple_list_item_1, android.R.id.text1)
         listAdapter = adapter
-        FetchData({c -> adapter.addAll(c); adapter.notifyDataSetChanged();}).execute()
+        //FetchData({c -> adapter.addAll(c); adapter.notifyDataSetChanged();}).execute()
+        var database = FirebaseDatabase.getInstance()
+
+        var myRef = database.getReference("list")
+        myRef.addValueEventListener(object: ValueEventListener{
+            override fun onDataChange(p0: DataSnapshot?) {
+                adapter.add(p0?.getValue(String::class.java))
+                adapter.notifyDataSetChanged()
+            }
+
+            override fun onCancelled(p0: DatabaseError?) {
+                Toast.makeText(context, "Cancelled", Toast.LENGTH_SHORT).show()
+            }
+        })
+
     }
 }
 
