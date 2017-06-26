@@ -7,7 +7,13 @@ android {
         release {
             keyAlias 'release'
             keyPassword 'tit1rstsT/f'
-            storeFile file('C:/Users/Andreas/AndroidStudioProjects/CameandWentV3/keystore')
+            storeFile file('../keystore')
+            storePassword 'tit1rstsT/f'
+        }
+    release {
+            keyAlias 'debug'
+            keyPassword 'tit1rstsT/f'
+            storeFile file('../keystore')
             storePassword 'tit1rstsT/f'
         }
     }
@@ -24,6 +30,7 @@ android {
     buildTypes {
         release {
             minifyEnabled false
+            debuggable true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
         }

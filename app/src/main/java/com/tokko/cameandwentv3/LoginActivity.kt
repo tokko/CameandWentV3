@@ -22,8 +22,10 @@ class LoginActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedList
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        var client = "552248423889-pjailnadigjg55n0ft2qc5scbq6pa1pf.apps.googleusercontent.com"
+
         var gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("1029588541811-3b86o6aigbv3qej24eieamak29geqiiq.apps.googleusercontent.com")
+                .requestIdToken(client)
                 .requestEmail()
                 .build()
         mGoogleApiClient = GoogleApiClient.Builder(this)
@@ -48,6 +50,7 @@ class LoginActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedList
             if (result.isSuccess) {
                 // Google Sign In was successful, authenticate with Firebase
                 val account = result.signInAccount
+                startActivity(Intent(this, MainActivity::class.java))
             } else {
                 Toast.makeText(this, "Login failed", Toast.LENGTH_SHORT).show()
                 // Google Sign In failed, update UI appropriately
