@@ -8,6 +8,11 @@ import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
+import com.google.firebase.auth.FirebaseAuth
+import android.util.Log
+import com.google.firebase.auth.GoogleAuthProvider
+
+
 
 
 /**
@@ -50,7 +55,25 @@ class LoginActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedList
             if (result.isSuccess) {
                 // Google Sign In was successful, authenticate with Firebase
                 val account = result.signInAccount
-                startActivity(Intent(this, MainActivity::class.java))
+                val credential = GoogleAuthProvider.getCredential(account?.idToken, null)
+                val mAuth = FirebaseAuth.getInstance()
+                mAuth.signInWithCredential(credential)
+                        .addOnCompleteListener(this) { task ->
+                            if (task.isSuccessful) {
+                                // Sign in success, update UI with the signed-in user's information
+                                Log.d("Auth", "signInWithCredential:success")
+                                val user = mAuth.currentUser
+                                startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+                            } else {
+                                // If sign in fails, display a message to the user.
+                                Log.w("Auth", "signInWithCredential:failure", task.exception)
+                                Toast.makeText(this@LoginActivity, "Authentication failed.",
+                                        Toast.LENGTH_SHORT).show()
+                            }
+
+                            // ...
+                        }
+
             } else {
                 Toast.makeText(this, "Login failed", Toast.LENGTH_SHORT).show()
                 // Google Sign In failed, update UI appropriately

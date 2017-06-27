@@ -3,11 +3,11 @@ package com.tokko.cameandwentv3
 import android.app.ListFragment
 import android.os.AsyncTask
 import android.os.Bundle
-import android.renderscript.Sampler
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -33,8 +33,9 @@ class DummyListFragment : ListFragment() {
         listAdapter = adapter
         //FetchData({c -> adapter.addAll(c); adapter.notifyDataSetChanged();}).execute()
         var database = FirebaseDatabase.getInstance()
-
+        var auth = FirebaseAuth.getInstance()
         var myRef = database.getReference("list")
+
         myRef.addValueEventListener(object: ValueEventListener{
             override fun onDataChange(p0: DataSnapshot?) {
                 adapter.add(p0?.getValue(String::class.java))
