@@ -12,6 +12,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.tokko.cameandwentv3.projects.ProjectFragment
 import java.util.*
 
 /**
@@ -21,7 +22,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        fragmentManager.beginTransaction().replace(android.R.id.content, DummyListFragment()).commit()
+        fragmentManager.beginTransaction().replace(android.R.id.content, ProjectFragment()).commit()
     }
 }
 
@@ -33,7 +34,6 @@ class DummyListFragment : ListFragment() {
         listAdapter = adapter
         //FetchData({c -> adapter.addAll(c); adapter.notifyDataSetChanged();}).execute()
         var database = FirebaseDatabase.getInstance()
-        var auth = FirebaseAuth.getInstance()
         var myRef = database.getReference("list")
 
         myRef.addValueEventListener(object: ValueEventListener{
