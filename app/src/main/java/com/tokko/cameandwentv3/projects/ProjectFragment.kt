@@ -1,6 +1,5 @@
 package com.tokko.cameandwentv3.projects
 
-import android.R
 import android.app.ListFragment
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,9 +9,10 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import com.tokko.cameandwentv3.MyApplication
+import com.tokko.cameandwentv3.events.EventEditProject
 import com.tokko.cameandwentv3.model.Project
 import kotlinx.android.synthetic.main.project_fragment.*
-import java.util.stream.Collectors
 
 class ProjectFragment : ListFragment() {
     var adapter : ArrayAdapter<Project>? = null
@@ -29,7 +29,7 @@ class ProjectFragment : ListFragment() {
            override fun onDataChange(p0: DataSnapshot?) {
                var projects = p0?.getValue(object: GenericTypeIndicator<HashMap<@kotlin.jvm.JvmSuppressWildcards String, @kotlin.jvm.JvmSuppressWildcards Project>>(){ })
                if(projects != null) {
-                   adapter = ArrayAdapter<Project>(activity, R.layout.simple_list_item_1, R.id.text1, projects.values.toList())
+                   adapter = ArrayAdapter<Project>(activity, android.R.layout.simple_list_item_1, android.R.id.text1, projects.values.toList())
                    listAdapter = adapter
                    adapter!!.notifyDataSetChanged()
                }
@@ -47,16 +47,18 @@ class ProjectFragment : ListFragment() {
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        add_project.setOnClickListener { fragmentManager.beginTransaction().replace(android.R.id.content, ProjectEditFragment.newInstance(null)).addToBackStack("somename").commit() }
+        add_project.setOnClickListener { (activity.application as MyApplication).bus.post(EventEditProject(null)) }
     }
 
     override fun onStart() {
         super.onStart()
         myRef?.addValueEventListener(listener)
+        (activity.application as MyApplication).bus.register(this)
     }
 
     override fun onStop() {
         super.onStop()
         myRef?.removeEventListener(listener)
+        (activity.application as MyApplication).bus.unregister(this)
     }
 }

@@ -11,7 +11,9 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import com.tokko.cameandwentv3.MyApplication
 import com.tokko.cameandwentv3.R
+import com.tokko.cameandwentv3.events.EventEditProjectComplete
 import com.tokko.cameandwentv3.model.Project
 import kotlinx.android.synthetic.main.project_edit_fragment.*
 
@@ -43,6 +45,16 @@ class ProjectEditFragment : Fragment(){
         super.onViewCreated(view, savedInstanceState)
         bindViews()
     }
+    override fun onStart() {
+        super.onStart()
+        (activity.application as MyApplication).bus.register(this)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        (activity.application as MyApplication).bus.unregister(this)
+    }
+
     override fun onResume() {
         super.onResume()
     }
@@ -59,8 +71,8 @@ class ProjectEditFragment : Fragment(){
         locations.adapter = locationAdapter
         ssids.adapter = SSIDAdapter
 
-        ok.setOnClickListener { FirebaseDatabase.getInstance().getReference(FirebaseAuth.getInstance().currentUser!!.uid+"/projects").push().setValue(project); fragmentManager.popBackStack() }
-        cancel.setOnClickListener { fragmentManager.popBackStack() }
+        ok.setOnClickListener { FirebaseDatabase.getInstance().getReference(FirebaseAuth.getInstance().currentUser!!.uid+"/projects").push().setValue(project); (activity.application as MyApplication).bus.post(EventEditProjectComplete(project)) }
+        cancel.setOnClickListener { (activity.application as MyApplication).bus.post(EventEditProjectComplete(project)) }
 
         title!!.addTextChangedListener(object: TextWatcher{
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
