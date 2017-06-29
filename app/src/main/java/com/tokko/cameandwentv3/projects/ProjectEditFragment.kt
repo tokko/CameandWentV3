@@ -1,16 +1,19 @@
 package com.tokko.cameandwentv3.projects
 
 import android.Manifest
+import android.app.Activity
 import android.app.AlertDialog
+import android.app.DialogFragment
 import android.app.Fragment
+import android.content.*
 import android.content.Context.LAYOUT_INFLATER_SERVICE
 import android.content.Context.LOCATION_SERVICE
-import android.content.DialogInterface
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.net.wifi.ScanResult
+import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.os.Looper
 import android.support.v4.app.ActivityCompat
@@ -22,6 +25,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
+import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.tokko.cameandwentv3.MyApplication
@@ -29,6 +33,9 @@ import com.tokko.cameandwentv3.R
 import com.tokko.cameandwentv3.events.EventEditProjectComplete
 import com.tokko.cameandwentv3.model.Project
 import kotlinx.android.synthetic.main.project_edit_fragment.*
+import kotlinx.android.synthetic.main.ssid_list_dialog_fragment.*
+import java.util.stream.Collector
+import java.util.stream.Collectors
 
 class ProjectEditFragment : Fragment(){
     var project : Project? = null
@@ -108,6 +115,41 @@ class ProjectEditFragment : Fragment(){
 
         add_location!!.setOnClickListener {
             getCurrentLocation() }
+        add_ssid!!.setOnClickListener { pickSSID() }
+    }
+
+
+    fun pickSSID(){
+        var wm = activity.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.CHANGE_WIFI_STATE) != PackageManager.PERMISSION_GRANTED
+                || ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_WIFI_STATE) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.CHANGE_WIFI_STATE)
+                    || ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.ACCESS_WIFI_STATE)) {
+                AlertDialog.Builder(activity.applicationContext)
+                        .setTitle("GPS permissions")
+                        .setMessage("This permission is required to detect when you enter or leave your working area. Without it this app will basically be a digital punch clock.")
+                        .setPositiveButton("Ok") { dialog, _ -> dialog?.dismiss() }
+
+            } else {
+                ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.ACCESS_WIFI_STATE), 1)
+            }
+            return
+        }
+        if(!wm.isWifiEnabled){
+            wm.isWifiEnabled = true
+            Toast.makeText(activity.applicationContext, "Wifi is disabled. Enabling...", Toast.LENGTH_SHORT).show()
+        }
+        activity.registerReceiver(object: BroadcastReceiver(){
+            override fun onReceive(context: Context?, intent: Intent?) {
+                showSSIDlist(wm.scanResults)
+            }
+        }, IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION))
+        wm.startScan()
+        return
+    }
+
+    private fun showSSIDlist(scanResults: List<ScanResult>) {
+        SSIDFragmentDialog.newInstance(scanResults.stream().map { x -> x.SSID }.collect(Collectors.toList())).show(fragmentManager, "ssid dialog")
     }
 
     private fun getCurrentLocation() {
@@ -163,6 +205,49 @@ class ProjectEditFragment : Fragment(){
                             .setMessage("Denying these permissions will kill the core usefulness of this app.")
                             .setPositiveButton("Ok") { dialog, _ -> dialog?.dismiss() }
             }
+            1 -> {
+                if(grantResults!!.isNotEmpty() && grantResults.toList().stream().allMatch({x -> x == PackageManager.PERMISSION_GRANTED}))
+                    pickSSID()
+                else
+                    AlertDialog.Builder(activity.applicationContext)
+                            .setTitle("GPS permissions")
+                            .setMessage("Denying these permissions will kill the core usefulness of this app.")
+                            .setPositiveButton("Ok") { dialog, _ -> dialog?.dismiss() }
+            }
+            }
+        }
+
+    class SSIDFragmentDialog: DialogFragment(){
+        companion object{
+            fun newInstance(ssids: List<String>): SSIDFragmentDialog{
+                val b = Bundle()
+                b.putStringArrayList("ssids", ArrayList(ssids))
+                val f = SSIDFragmentDialog()
+                f.arguments = b
+                return f
+            }
+        }
+
+        var ssids: ArrayList<String> = ArrayList()
+
+        override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            ssids = (savedInstanceState ?: arguments).getStringArrayList("ssids")
+        }
+
+        override fun onSaveInstanceState(outState: Bundle?) {
+            super.onSaveInstanceState(outState)
+            outState!!.putStringArrayList("ssids", ssids)
+        }
+
+        override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
+            return inflater!!.inflate(R.layout.ssid_list_dialog_fragment, null, false)
+        }
+
+        override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+            super.onViewCreated(view, savedInstanceState)
+            list.adapter = ArrayAdapter(activity.applicationContext, android.R.layout.simple_list_item_1, android.R.id.text1, ssids)
+            list.setOnItemClickListener { _, _, position, _ ->  targetFragment.onActivityResult(0, Activity.RESULT_OK, Intent().putExtra("ssid", ssids[position])); dismiss()}
         }
     }
 }
