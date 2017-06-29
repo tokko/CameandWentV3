@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        currentFragment = fragmentManager.getFragment(savedInstanceState, "fragment") ?: ProjectFragment()
+        currentFragment = if(savedInstanceState != null && savedInstanceState.containsKey("fragment")) fragmentManager.getFragment(savedInstanceState, "fragment") else ProjectFragment()
         fragmentManager.beginTransaction().replace(android.R.id.content, currentFragment).commit()
     }
 

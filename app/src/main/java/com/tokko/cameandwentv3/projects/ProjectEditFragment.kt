@@ -3,6 +3,8 @@ package com.tokko.cameandwentv3.projects
 import android.app.Fragment
 import android.location.Location
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -59,5 +61,17 @@ class ProjectEditFragment : Fragment(){
 
         ok.setOnClickListener { FirebaseDatabase.getInstance().getReference(FirebaseAuth.getInstance().currentUser!!.uid+"/projects").push().setValue(project); fragmentManager.popBackStack() }
         cancel.setOnClickListener { fragmentManager.popBackStack() }
+
+        title!!.addTextChangedListener(object: TextWatcher{
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                project!!.title = s.toString()
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+        })
     }
 }

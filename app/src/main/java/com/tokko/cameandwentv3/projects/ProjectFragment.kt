@@ -12,6 +12,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.tokko.cameandwentv3.model.Project
 import kotlinx.android.synthetic.main.project_fragment.*
+import java.util.stream.Collectors
 
 class ProjectFragment : ListFragment() {
     var adapter : ArrayAdapter<Project>? = null
@@ -22,15 +23,13 @@ class ProjectFragment : ListFragment() {
         super.onCreate(savedInstanceState)
         var uid = FirebaseAuth.getInstance().currentUser?.uid
         var database = FirebaseDatabase.getInstance()
-        myRef = database.getReference(uid+"/projects")
+        myRef = database.reference.child(uid).child("projects")
 
        listener = object : ValueEventListener {
            override fun onDataChange(p0: DataSnapshot?) {
-               var projects = p0?.getValue(object: GenericTypeIndicator<HashMap<String, Project>>(){ })
+               var projects = p0?.getValue(object: GenericTypeIndicator<HashMap<@kotlin.jvm.JvmSuppressWildcards String, @kotlin.jvm.JvmSuppressWildcards Project>>(){ })
                if(projects != null) {
-                   var values = projects as HashMap<String, Project>
-                   var valuesList = values.values.toList()
-                   adapter = ArrayAdapter<Project>(activity, R.layout.simple_list_item_1, R.id.text1, valuesList)
+                   adapter = ArrayAdapter<Project>(activity, R.layout.simple_list_item_1, R.id.text1, projects.values.toList())
                    listAdapter = adapter
                    adapter!!.notifyDataSetChanged()
                }
