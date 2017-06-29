@@ -1,8 +1,10 @@
 package com.tokko.cameandwentv3
 
+import android.app.Fragment
 import android.app.ListFragment
 import android.os.AsyncTask
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.ArrayAdapter
@@ -19,10 +21,17 @@ import java.util.*
  * Created by andre on 10/06/2017.
  */
 class MainActivity : AppCompatActivity() {
+    var currentFragment: Fragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        fragmentManager.beginTransaction().replace(android.R.id.content, ProjectFragment()).commit()
+        currentFragment = fragmentManager.getFragment(savedInstanceState, "fragment") ?: ProjectFragment()
+        fragmentManager.beginTransaction().replace(android.R.id.content, currentFragment).commit()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+        fragmentManager.putFragment(outState, "fragment", currentFragment)
     }
 }
 
