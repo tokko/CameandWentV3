@@ -36,9 +36,9 @@ class ProjectFragment : ListFragment() {
                    adapter!!.notifyDataSetChanged()
                }
                else{
-                   add_project.visibility = View.VISIBLE
-                    list_empty!!.visibility = View.GONE
+                   list_empty!!.visibility = View.GONE
                }
+               add_project.visibility = View.VISIBLE
            }
 
            override fun onCancelled(p0: DatabaseError?) {
