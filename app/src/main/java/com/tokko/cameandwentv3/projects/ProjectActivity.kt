@@ -30,7 +30,7 @@ class ProjectActivity : Activity() {
 
     @Subscribe
     fun onEditProject(event: EventEditProject){
-        editFragment = ProjectEditFragment.newInstance(null)
+        editFragment = ProjectEditFragment.newInstance(event.project)
         fragmentManager.beginTransaction().replace(android.R.id.content, editFragment).addToBackStack("somename").commit()
     }
 

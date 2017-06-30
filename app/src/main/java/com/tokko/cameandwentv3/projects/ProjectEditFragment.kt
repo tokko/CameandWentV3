@@ -54,8 +54,10 @@ class ProjectEditFragment : Fragment(){
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val arguments = arguments
         project = (savedInstanceState ?: arguments)?.getSerializable("project") as? Project ?: Project()
     }
+
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater!!.inflate(R.layout.project_edit_fragment, null, false)
@@ -98,8 +100,13 @@ class ProjectEditFragment : Fragment(){
         locations.adapter = locationAdapter
         ssids.adapter = SSIDAdapter
 
-        ok.setOnClickListener { FirebaseDatabase.getInstance().getReference(FirebaseAuth.getInstance().currentUser!!.uid+"/projects").push().setValue(project); (activity.application as MyApplication).bus.post(EventEditProjectComplete(project)) }
-        cancel.setOnClickListener { (activity.application as MyApplication).bus.post(EventEditProjectComplete(project)) }
+        ok.setOnClickListener {
+            FirebaseDatabase.getInstance().getReference(FirebaseAuth.getInstance()
+                    .currentUser!!.uid+"/projects/"+project!!.id)
+                    .setValue(project)
+            (activity.application as MyApplication).bus.post(EventEditProjectComplete(project)) }
+            cancel.setOnClickListener { (activity.application as MyApplication).bus.post(EventEditProjectComplete(project))
+        }
 
         title!!.addTextChangedListener(object: TextWatcher{
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
