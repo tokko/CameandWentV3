@@ -2,7 +2,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
     <ToggleButton
         android:layout_width="match_parent"
         android:textOff="Clockin"
@@ -27,3 +26,4 @@
         android:text="Loading projects"
         android:layout_height="match_parent" />
 </RelativeLayout>
+
