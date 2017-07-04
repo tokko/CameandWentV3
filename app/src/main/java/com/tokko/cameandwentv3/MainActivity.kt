@@ -4,6 +4,8 @@ import android.app.Fragment
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.Menu
+import android.view.MenuItem
 import com.tokko.cameandwentv3.projects.ProjectActivity
 import com.tokko.cameandwentv3.projects.ProjectFragment
 
@@ -20,6 +22,20 @@ class MainActivity : AppCompatActivity() {
         startActivity(Intent(this, ProjectActivity::class.java))
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+         menuInflater.inflate(R.menu.main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when(item!!.itemId){
+            R.id.edit_projevts -> {
+                startActivity(Intent(this, ProjectActivity::class.java))
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
         fragmentManager.putFragment(outState, "fragment", currentFragment)

@@ -11,8 +11,6 @@ import com.google.android.gms.common.api.GoogleApiClient
 import com.google.firebase.auth.FirebaseAuth
 import android.util.Log
 import com.google.firebase.auth.GoogleAuthProvider
-import com.tokko.cameandwentv3.projects.ProjectActivity
-import com.tokko.cameandwentv3.projects.ProjectFragment
 
 
 /**
@@ -63,7 +61,8 @@ class LoginActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedList
                                 // Sign in success, update UI with the signed-in user's information
                                 Log.d("Auth", "signInWithCredential:success")
                                 val user = mAuth.currentUser
-                                startActivity(Intent(this@LoginActivity, ProjectActivity::class.java))
+                                startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+                                finish()
                             } else {
                                 // If sign in fails, display a message to the user.
                                 Log.w("Auth", "signInWithCredential:failure", task.exception)
