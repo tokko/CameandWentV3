@@ -12,6 +12,7 @@ import com.tokko.cameandwentv3.R
 import com.tokko.cameandwentv3.model.LogEntry
 import kotlinx.android.synthetic.main.log_entry.*
 import kotlinx.android.synthetic.main.log_list_fragment.*
+import java.text.SimpleDateFormat
 import java.util.concurrent.TimeUnit
 
 
@@ -32,9 +33,9 @@ class LogListFragment: Fragment() {
             override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
                 val v = convertView ?: (activity.applicationContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater).inflate(R.layout.log_entry, null)
                 val item = getItem(position)
-                (v.findViewById(R.id.timestamp) as TextView).text = item?.timestamp?.toString() ?: ""
+                (v.findViewById(R.id.timestamp) as TextView).text = SimpleDateFormat("HH:mm:ss").format(item?.timestamp) ?: ""
                 (v.findViewById(R.id.action) as TextView).text = if(item.entered) "Arrived" else "Departed"
-                (v.findViewById(R.id.project_name) as TextView).text = "Kek"
+                (v.findViewById(R.id.project_name) as TextView).text = item?.projectId
                 return v
             }
         }
