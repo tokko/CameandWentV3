@@ -2,6 +2,7 @@ package com.tokko.cameandwentv3.log
 
 import android.app.Fragment
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,8 @@ import android.widget.ArrayAdapter
 import android.widget.TextView
 import com.tokko.cameandwentv3.R
 import com.tokko.cameandwentv3.model.LogEntry
+import com.tokko.cameandwentv3.model.Project
+import com.tokko.cameandwentv3.projects.ProjectPickerDialog
 import kotlinx.android.synthetic.main.log_entry.*
 import kotlinx.android.synthetic.main.log_list_fragment.*
 import java.text.SimpleDateFormat
@@ -39,15 +42,27 @@ class LogListFragment: Fragment() {
                 return v
             }
         }
-        clock_button.setOnCheckedChangeListener { buttonView, isChecked ->
-            val duration = System.currentTimeMillis()
-            val hours = TimeUnit.MILLISECONDS.toHours(duration)
-            val minutes = TimeUnit.MILLISECONDS.toMinutes(duration - TimeUnit.HOURS.toMillis(hours))
-            val seconds = TimeUnit.MILLISECONDS.toSeconds(duration - TimeUnit.HOURS.toMillis(hours) - TimeUnit.MINUTES.toMillis(minutes))
-            val durationString = String.format("%02d:%02d:%02d", hours, minutes, seconds)
-            adapter!!.add(LogEntry(System.currentTimeMillis(), isChecked))
-            adapter!!.notifyDataSetChanged()
+        clock_button.setOnCheckedChangeListener { _, _ ->
+            val projectPicker = ProjectPickerDialog()
+            projectPicker.setTargetFragment(this, 0)
+            projectPicker.show(activity.fragmentManager, "some tag")
         }
         loglist.adapter = adapter
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        when(requestCode){
+            0 -> {
+                val duration = System.currentTimeMillis()
+                val hours = TimeUnit.MILLISECONDS.toHours(duration)
+                val minutes = TimeUnit.MILLISECONDS.toMinutes(duration - TimeUnit.HOURS.toMillis(hours))
+                val seconds = TimeUnit.MILLISECONDS.toSeconds(duration - TimeUnit.HOURS.toMillis(hours) - TimeUnit.MINUTES.toMillis(minutes))
+                val durationString = String.format("%02d:%02d:%02d", hours, minutes, seconds)
+                val p = data!!.getSerializableExtra("project") as Project
+                adapter!!.add(LogEntry(System.currentTimeMillis(), clock_button.isChecked, p.title))
+                adapter!!.notifyDataSetChanged()
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data)
     }
 }
