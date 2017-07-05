@@ -38,29 +38,39 @@ class LogListFragment: Fragment() {
                 val item = getItem(position)
                 (v.findViewById(R.id.timestamp) as TextView).text = SimpleDateFormat("HH:mm:ss").format(item?.timestamp) ?: ""
                 (v.findViewById(R.id.action) as TextView).text = if(item.entered) "Arrived" else "Departed"
-                (v.findViewById(R.id.project_name) as TextView).text = item?.projectId
+                (v.findViewById(R.id.project_name) as TextView).text = item?.projectTitle
                 return v
             }
         }
-        clock_button.setOnCheckedChangeListener { _, _ ->
-            val projectPicker = ProjectPickerDialog()
-            projectPicker.setTargetFragment(this, 0)
-            projectPicker.show(activity.fragmentManager, "some tag")
+        clock_button.setOnCheckedChangeListener { _, isChecked ->
+            if(isChecked) {
+                val projectPicker = ProjectPickerDialog()
+                projectPicker.setTargetFragment(this, 0)
+                projectPicker.show(activity.fragmentManager, "some tag")
+            }
+            else{
+                val item = adapter!!.getItem(adapter!!.count - 1)
+                clockin(item.projectId, item.projectTitle, false)
+            }
         }
         loglist.adapter = adapter
+    }
+
+    private fun clockin(projectId: String, projectTitle: String, action: Boolean){
+        val duration = System.currentTimeMillis()
+        val hours = TimeUnit.MILLISECONDS.toHours(duration)
+        val minutes = TimeUnit.MILLISECONDS.toMinutes(duration - TimeUnit.HOURS.toMillis(hours))
+        val seconds = TimeUnit.MILLISECONDS.toSeconds(duration - TimeUnit.HOURS.toMillis(hours) - TimeUnit.MINUTES.toMillis(minutes))
+        val durationString = String.format("%02d:%02d:%02d", hours, minutes, seconds)
+        adapter!!.add(LogEntry(System.currentTimeMillis(), action,projectId, projectTitle))
+        adapter!!.notifyDataSetChanged()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when(requestCode){
             0 -> {
-                val duration = System.currentTimeMillis()
-                val hours = TimeUnit.MILLISECONDS.toHours(duration)
-                val minutes = TimeUnit.MILLISECONDS.toMinutes(duration - TimeUnit.HOURS.toMillis(hours))
-                val seconds = TimeUnit.MILLISECONDS.toSeconds(duration - TimeUnit.HOURS.toMillis(hours) - TimeUnit.MINUTES.toMillis(minutes))
-                val durationString = String.format("%02d:%02d:%02d", hours, minutes, seconds)
                 val p = data!!.getSerializableExtra("project") as Project
-                adapter!!.add(LogEntry(System.currentTimeMillis(), clock_button.isChecked, p.title))
-                adapter!!.notifyDataSetChanged()
+                clockin(p.id, p.title, clock_button.isChecked)
             }
         }
         super.onActivityResult(requestCode, resultCode, data)
