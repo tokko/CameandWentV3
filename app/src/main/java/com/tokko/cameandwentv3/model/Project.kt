@@ -9,7 +9,7 @@ import kotlin.collections.ArrayList
  * Created by andre on 28/06/2017.
  */
 class Project : Serializable{
-    var id : String? = UUID.randomUUID().toString()
+    var id : String = UUID.randomUUID().toString()
     var title : String = ""
     var locations: ArrayList<ProjectLocation> = ArrayList()
     var SSIDs: ArrayList<String> = ArrayList()
