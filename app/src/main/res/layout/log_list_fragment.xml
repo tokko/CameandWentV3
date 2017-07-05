@@ -17,6 +17,7 @@
         android:layout_width="match_parent"
         android:id="@+id/loglist"
         android:layout_above="@id/loglist"
+        android:stackFromBottom="true"
         android:layout_height="wrap_content"/>
     <ProgressBar
         android:layout_width="wrap_content"
