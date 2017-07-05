@@ -7,6 +7,7 @@ import android.content.Intent
 import android.location.LocationManager
 import android.os.IBinder
 import android.widget.ArrayAdapter
+import com.google.android.gms.location.LocationServices
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.tokko.cameandwentv3.model.Project
@@ -42,6 +43,7 @@ class GeofenceService : Service() {
     }
 
     private fun registerGeofences(projects: Collection<Project>) {
+        //LocationServices.GeofencingApi
     }
 
     private fun unRegisterGeofences(projects: Collection<Project>){
