@@ -19,7 +19,7 @@ import kotlinx.android.synthetic.main.project_fragment.*
  */
 class ProjectPickerDialog: DialogFragment() {
     var projects: List<Project>? = null
-
+    var listener: ValueEventListener? = null
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater!!.inflate(com.tokko.cameandwentv3.R.layout.project_fragment, null, false)
     }
@@ -29,7 +29,7 @@ class ProjectPickerDialog: DialogFragment() {
         add_project!!.visibility = View.GONE
         val listView = getView().findViewById(android.R.id.list) as ListView
         listView.emptyView = list_empty
-        FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("projects").addValueEventListener(object: ValueEventListener{
+        object: ValueEventListener{
             override fun onDataChange(p0: DataSnapshot?) {
                 val p = p0?.getValue(object: GenericTypeIndicator<HashMap<@JvmSuppressWildcards String, @JvmSuppressWildcards Project>>(){ })
                 p?.entries?.stream()?.map { e -> e.value.id = e.key }
@@ -46,9 +46,9 @@ class ProjectPickerDialog: DialogFragment() {
                     val progressBar = ProgressBar(activity)
                     progressBar.isIndeterminate
                     listView.emptyView = progressBar
-                            listView.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
-                                targetFragment.onActivityResult(0, Activity.RESULT_OK, Intent().putExtra("project", projects!![position]))
-                                dismiss()
+                    listView.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
+                        targetFragment.onActivityResult(0, Activity.RESULT_OK, Intent().putExtra("project", projects!![position]))
+                        dismiss()
                     }
                     adapter.notifyDataSetChanged()
                 }
@@ -57,6 +57,17 @@ class ProjectPickerDialog: DialogFragment() {
             }
 
             override fun onCancelled(p0: DatabaseError?) {}
-        })
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("projects").addValueEventListener(listener)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        FirebaseDatabase.getInstance().reference.removeEventListener(listener)
+
     }
 }

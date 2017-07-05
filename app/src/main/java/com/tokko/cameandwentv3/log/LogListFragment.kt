@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit
  */
 class LogListFragment: Fragment() {
     var adapter: ArrayAdapter<LogEntry>? = null
-
+    var listener: ValueEventListener? = null
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater!!.inflate(R.layout.log_list_fragment, null, false)
     }
@@ -48,7 +48,7 @@ class LogListFragment: Fragment() {
 
         loglist.adapter = adapter
         loglist.emptyView = list_empty
-        FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentries").addValueEventListener(object: ValueEventListener{
+        listener = object: ValueEventListener{
             override fun onDataChange(p0: DataSnapshot?) {
                 var logEntries = p0?.getValue(object: GenericTypeIndicator<HashMap<@JvmSuppressWildcards String, @JvmSuppressWildcards LogEntry>>(){ })?.values?.toList()
                 logEntries = logEntries?.sortedBy { c -> c.timestamp }
@@ -67,7 +67,7 @@ class LogListFragment: Fragment() {
             }
 
             override fun onCancelled(p0: DatabaseError?) {}
-        })
+        }
         clock_button.setOnClickListener { _ ->
             if(clock_button.isChecked) {
                 val projectPicker = ProjectPickerDialog()
@@ -79,6 +79,17 @@ class LogListFragment: Fragment() {
                 clockin(item.projectId, item.projectTitle, false)
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentries").addValueEventListener(listener)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        FirebaseDatabase.getInstance().reference.removeEventListener(listener)
+
     }
 
     private fun clockin(projectId: String, projectTitle: String, action: Boolean){

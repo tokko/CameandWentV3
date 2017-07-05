@@ -158,25 +158,6 @@ class ProjectEditFragment : Fragment(){
             project!!.addLocation(location)
             locationAdapter!!.notifyDataSetChanged()
         }
-
-        /*
-        mLocationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, object: LocationListener{
-            override fun onProviderEnabled(provider: String?) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-            override fun onProviderDisabled(provider: String?) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-            override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-            override fun onLocationChanged(location: Location?) {
-                if(location != null)
-                    project!!.locations.add(location)
-            }
-
-        }, Looper.getMainLooper())
-        */
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>?, grantResults: IntArray?) {
