@@ -9,6 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
 import com.tokko.cameandwentv3.R
 import com.tokko.cameandwentv3.model.LogEntry
 import com.tokko.cameandwentv3.model.Project
@@ -42,8 +44,32 @@ class LogListFragment: Fragment() {
                 return v
             }
         }
-        clock_button.setOnCheckedChangeListener { _, isChecked ->
-            if(isChecked) {
+
+
+        loglist.adapter = adapter
+        loglist.emptyView = list_empty
+        FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentries").addValueEventListener(object: ValueEventListener{
+            override fun onDataChange(p0: DataSnapshot?) {
+                var logEntries = p0?.getValue(object: GenericTypeIndicator<HashMap<@JvmSuppressWildcards String, @JvmSuppressWildcards LogEntry>>(){ })?.values?.toList()
+                logEntries = logEntries?.sortedBy { c -> c.timestamp }
+                adapter!!.clear()
+                if(logEntries != null){
+                    adapter!!.addAll(logEntries.toList())
+                    adapter!!.notifyDataSetChanged()
+                    val entered = logEntries.toList()[logEntries.count() - 1].entered
+                    clock_button!!.isChecked = entered
+                }
+                else{
+                    list_empty!!.visibility = View.GONE
+                    clock_button.isChecked = false
+                }
+                clock_button!!.visibility = View.VISIBLE
+            }
+
+            override fun onCancelled(p0: DatabaseError?) {}
+        })
+        clock_button.setOnClickListener { _ ->
+            if(clock_button.isChecked) {
                 val projectPicker = ProjectPickerDialog()
                 projectPicker.setTargetFragment(this, 0)
                 projectPicker.show(activity.fragmentManager, "some tag")
@@ -53,7 +79,6 @@ class LogListFragment: Fragment() {
                 clockin(item.projectId, item.projectTitle, false)
             }
         }
-        loglist.adapter = adapter
     }
 
     private fun clockin(projectId: String, projectTitle: String, action: Boolean){
@@ -62,8 +87,10 @@ class LogListFragment: Fragment() {
         val minutes = TimeUnit.MILLISECONDS.toMinutes(duration - TimeUnit.HOURS.toMillis(hours))
         val seconds = TimeUnit.MILLISECONDS.toSeconds(duration - TimeUnit.HOURS.toMillis(hours) - TimeUnit.MINUTES.toMillis(minutes))
         val durationString = String.format("%02d:%02d:%02d", hours, minutes, seconds)
-        adapter!!.add(LogEntry(System.currentTimeMillis(), action,projectId, projectTitle))
-        adapter!!.notifyDataSetChanged()
+        val logEntry = LogEntry(System.currentTimeMillis(), action,projectId, projectTitle)
+        FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentries").child(logEntry.id).setValue(logEntry)
+      //  adapter!!.add(LogEntry(System.currentTimeMillis(), action,projectId, projectTitle))
+      // adapter!!.notifyDataSetChanged()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
