@@ -6,12 +6,8 @@ import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.location.LocationManager
-import android.os.IBinder
-import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
-import android.widget.ArrayAdapter
 import com.google.android.gms.location.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
@@ -24,7 +20,9 @@ import java.util.stream.Collectors
 /**
  * Created by andreas on 4/07/17.
  */
-class GeofenceService : Service() {
+class GeofenceService : IntentService("GeofenceService") {
+
+
     companion object {
         val ACTION_REGISTER = "com.tokko.cameandwentv3.geofenceservice.ACTION_REGISTER"
         val ACTION_REGISTER_PAYLOAD_DELIVERED = "com.tokko.cameandwentv3.geofenceservice.ACTION_REGISTER_PAYLOAD_DELIVERED"
@@ -33,11 +31,8 @@ class GeofenceService : Service() {
             context.startService(Intent(context, GeofenceService::class.java).setAction(ACTION_REGISTER))
         }
     }
-    override fun onBind(intent: Intent?): IBinder {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onHandleIntent(intent: Intent?) {
         if(intent?.action.equals(ACTION_REGISTER)) {
             FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("projects").
                     addValueEventListener(object : ValueEventListener {
@@ -66,7 +61,6 @@ class GeofenceService : Service() {
             if (geofencingEvent.hasError()) {
 
                 Log.e("GeofenceService", "Geofence error")
-                return super.onStartCommand(intent, flags, startId)
             }
             val geofenceTransition = geofencingEvent.geofenceTransition
 
@@ -81,8 +75,6 @@ class GeofenceService : Service() {
                 }
             }
         }
-        return super.onStartCommand(intent, flags, startId)
-
     }
 
     private fun registerGeofences(projects: Collection<Project>) {
