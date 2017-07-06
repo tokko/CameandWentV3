@@ -8,10 +8,10 @@ import java.util.concurrent.TimeUnit
  * Created by andreas on 6/07/17.
  */
 class Duration {
-    constructor(logs: ArrayList<LogEntry>){
-        this.logs = logs
+    constructor(logs: Collection<LogEntry>){
+        this.logs = ArrayList<LogEntry>(logs)
         date = SimpleDateFormat("yyyy:MM:dd").format(Date(logs.first().timestamp))
-        logs.sumBy { x -> if(x.entered) x.timestamp else -x.timestamp }
+        this.logs.sumBy { x -> if(x.entered) x.timestamp else -x.timestamp }
         val duration = System.currentTimeMillis()
         val hours = TimeUnit.MILLISECONDS.toHours(duration)
         val minutes = TimeUnit.MILLISECONDS.toMinutes(duration - TimeUnit.HOURS.toMillis(hours))

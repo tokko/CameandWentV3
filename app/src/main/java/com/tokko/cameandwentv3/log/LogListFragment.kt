@@ -14,11 +14,13 @@ import android.widget.TextView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.tokko.cameandwentv3.R
+import com.tokko.cameandwentv3.model.Duration
 import com.tokko.cameandwentv3.model.LogEntry
 import com.tokko.cameandwentv3.model.Project
 import com.tokko.cameandwentv3.projects.ProjectPickerDialog
 import kotlinx.android.synthetic.main.log_entry.*
 import kotlinx.android.synthetic.main.log_list_fragment.*
+import org.joda.time.MutableDateTime
 import java.text.SimpleDateFormat
 import java.util.concurrent.TimeUnit
 
@@ -44,10 +46,14 @@ class LogListFragment: Fragment() {
             override fun onDataChange(p0: DataSnapshot?) {
                 var logEntries = p0?.getValue(object: GenericTypeIndicator<HashMap<@JvmSuppressWildcards String, @JvmSuppressWildcards LogEntry>>(){ })?.values?.toList()
                 logEntries = logEntries?.sortedBy { c -> c.timestamp }
+                val durations = logEntries?.groupBy { le ->
+                    val dt = MutableDateTime(le.timestamp)
+                    dt.millisOfDay = 0
+                }?.map { x -> Duration(x.value) }?.sortedBy { d -> d.date }
                 adapter!!.clear()
-                if(logEntries != null){
-                    adapter!!.addAll(logEntries.toList())
-                    val entered = logEntries.toList()[logEntries.count() - 1].entered
+                if(durations != null){
+                    adapter!!.addAll(durations)
+                    val entered = durations.toList().last().logs.toList().sortedBy { x -> x.timestamp }.last().entered
                     clock_button!!.isChecked = entered
                 }
                 else{

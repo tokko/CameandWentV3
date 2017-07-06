@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:text="Date:"
+        android:id="@+id/date_label"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:id="@+id/date"
+        android:text="date placeholder"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@+id/date_label"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:id="@+id/duration_label"
+        android:text="Duration: "
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@+id/date"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="18dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:id="@+id/timestamp"
+        android:text="duration placeholder"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@+id/duration_label"
+        app:layout_constraintTop_toTopOf="@+id/duration_label" />
+</android.support.constraint.ConstraintLayout>
