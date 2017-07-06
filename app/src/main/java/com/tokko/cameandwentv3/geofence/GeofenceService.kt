@@ -71,7 +71,7 @@ class GeofenceService : IntentService("GeofenceService") {
                 val dbRef = FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentries")
                 triggeringGeofences.stream().forEach { g ->
                     val logEntry = LogEntry(System.currentTimeMillis(), geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER, g.requestId.split(":")[0], g.requestId.split(":")[2])
-                    dbRef.setValue(logEntry.id, logEntry)
+                    dbRef.child(logEntry.id).setValue(logEntry)
                 }
             }
         }

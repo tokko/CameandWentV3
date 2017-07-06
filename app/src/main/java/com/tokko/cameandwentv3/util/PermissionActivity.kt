@@ -23,12 +23,13 @@ class PermissionActivity: Activity() {
                         .setTitle("GPS permissions")
                         .setMessage("This permission is required to detect when you enter or leave your working area. Without it this app will basically be a digital punch clock.")
                         .setPositiveButton("Ok") { dialog, _ -> dialog?.dismiss() }
-                finish()
             } else {
                 ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION), 0)
             }
             return
         }
+        else
+            finish()
     }
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>?, grantResults: IntArray?) {
         when(requestCode){
