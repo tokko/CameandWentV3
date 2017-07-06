@@ -19,7 +19,7 @@ class Project : Serializable{
     }
 
     fun addLocation(location: Location) {
-        locations.add(ProjectLocation(location.latitude, location.latitude))
+        locations.add(ProjectLocation(location.latitude, location.longitude))
     }
 
     class ProjectLocation(): Serializable{
