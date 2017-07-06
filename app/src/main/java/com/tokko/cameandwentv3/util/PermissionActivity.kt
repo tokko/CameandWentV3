@@ -36,7 +36,7 @@ class PermissionActivity: Activity() {
             0 -> {
                 if(grantResults!!.isNotEmpty() && grantResults.toList().stream().allMatch({x -> x == PackageManager.PERMISSION_GRANTED})) {
                     GeofenceService.initGeofences(applicationContext)
-                    finish()
+                    GeofenceService.initGeofences(this)
                 }
                 else
                     AlertDialog.Builder(applicationContext)
