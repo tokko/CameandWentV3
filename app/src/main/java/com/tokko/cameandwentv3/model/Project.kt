@@ -22,7 +22,7 @@ class Project : Serializable{
         locations.add(ProjectLocation(location.latitude, location.latitude))
     }
 
-    class ProjectLocation(){
+    class ProjectLocation(): Serializable{
         constructor(latitude: Double, longitude: Double): this(){
             this.latitude = latitude
             this.longitude = longitude

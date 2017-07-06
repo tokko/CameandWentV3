@@ -11,6 +11,7 @@ import com.google.android.gms.common.api.GoogleApiClient
 import com.google.firebase.auth.FirebaseAuth
 import android.util.Log
 import com.google.firebase.auth.GoogleAuthProvider
+import com.tokko.cameandwentv3.geofence.GeofenceService
 
 
 /**
@@ -61,6 +62,7 @@ class LoginActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedList
                                 // Sign in success, update UI with the signed-in user's information
                                 Log.d("Auth", "signInWithCredential:success")
                                 val user = mAuth.currentUser
+                                initPostLogin()
                                 startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                                 finish()
                             } else {
@@ -79,6 +81,10 @@ class LoginActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedList
                 // ...
             }
         }
+    }
+
+    private fun initPostLogin() {
+        GeofenceService.initGeofences(applicationContext)
     }
 
 }

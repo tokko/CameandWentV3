@@ -30,6 +30,8 @@
         </activity>
         <activity android:name=".MainActivity" />
         <activity android:name=".projects.ProjectActivity" />
+        <service android:name=".geofence.GeofenceService"/>
+        <activity android:name=".util.PermissionActivity"/>
     </application>
 
 </manifest>
