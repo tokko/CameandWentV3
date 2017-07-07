@@ -24,4 +24,5 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--dontwarn
+-dontwarn org.joda.convert.**
+-keep public class com.tokko.cameandwentv3.model** {*;}

@@ -35,7 +35,7 @@ class ProjectActivity : Activity() {
     }
 
     @Subscribe
-    fun onEditProjectComplete(event: EventEditProjectComplete){
+    fun onEditProjectComplete(@Suppress("UNUSED_PARAMETER") event: EventEditProjectComplete){
         fragmentManager.popBackStack()
         editFragment = null
     }
