@@ -1,17 +1,20 @@
 package com.tokko.cameandwentv3
 
 import android.content.Intent
+import android.content.IntentFilter
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.support.v4.app.FragmentActivity
+import android.util.Log
 import android.widget.Toast
 import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.firebase.auth.FirebaseAuth
-import android.util.Log
 import com.google.firebase.auth.GoogleAuthProvider
 import com.tokko.cameandwentv3.geofence.GeofenceService
+import com.tokko.cameandwentv3.wifi.WifiReceiver
 
 
 /**
@@ -85,6 +88,8 @@ class LoginActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedList
 
     private fun initPostLogin() {
         GeofenceService.initGeofences(applicationContext)
+        applicationContext.registerReceiver(WifiReceiver(), IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
+
     }
 
 }

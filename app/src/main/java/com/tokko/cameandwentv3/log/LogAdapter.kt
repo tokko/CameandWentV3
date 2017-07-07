@@ -11,6 +11,7 @@ import com.tokko.cameandwentv3.R
 import com.tokko.cameandwentv3.model.Duration
 import com.tokko.cameandwentv3.model.LogEntry
 import java.text.SimpleDateFormat
+import java.util.*
 
 /**
  * Created by andreas on 6/07/17.
@@ -21,14 +22,16 @@ class LogAdapter(context: Context): BaseExpandableListAdapter() {
     val observers = ArrayList<DataSetObserver>()
     fun clear(){
         durations.clear()
+        observers.forEach { x -> x.onInvalidated() }
     }
 
     fun addAll(entries: Collection<Duration>){
         clear()
         this.durations.addAll(entries)
+        observers.forEach { x-> x.onChanged() }
     }
     override fun getChildrenCount(groupPosition: Int): Int {
-        return durations.size
+        return durations[groupPosition].logs.size
     }
 
     override fun getGroup(groupPosition: Int): Duration {
@@ -36,7 +39,6 @@ class LogAdapter(context: Context): BaseExpandableListAdapter() {
     }
 
     override fun onGroupCollapsed(groupPosition: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun isEmpty(): Boolean {
@@ -53,11 +55,10 @@ class LogAdapter(context: Context): BaseExpandableListAdapter() {
     }
 
     override fun onGroupExpanded(groupPosition: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun getCombinedChildId(groupId: Long, childId: Long): Long {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return (groupId xor childId)
     }
 
     override fun getGroupId(groupPosition: Int): Long {
@@ -90,14 +91,14 @@ class LogAdapter(context: Context): BaseExpandableListAdapter() {
     }
 
     override fun getCombinedGroupId(groupId: Long): Long {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return groupId
     }
 
     override fun getGroupView(groupPosition: Int, isExpanded: Boolean, convertView: View?, parent: ViewGroup?): View {
         val v = convertView ?: (context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater).inflate(R.layout.duration, null)
         val item = getGroup(groupPosition)
-        (v.findViewById(R.id.timestamp) as TextView).text = SimpleDateFormat("HH:mm:ss").format(item.date) ?: ""
-        (v.findViewById(R.id.action) as TextView).text = item.duration
+        (v.findViewById(R.id.date) as TextView).text = item.date
+        (v.findViewById(R.id.duration) as TextView).text = item.duration
         return v
     }
 
