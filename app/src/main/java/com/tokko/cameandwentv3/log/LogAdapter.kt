@@ -95,10 +95,10 @@ class LogAdapter(context: Context): BaseExpandableListAdapter() {
     }
 
     override fun getGroupView(groupPosition: Int, isExpanded: Boolean, convertView: View?, parent: ViewGroup?): View {
-        val v = convertView ?: (context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater).inflate(R.layout.duration, null)
+        val v = convertView ?: (context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater).inflate(android.R.layout.simple_expandable_list_item_2, null)
         val item = getGroup(groupPosition)
-        (v.findViewById(R.id.date) as TextView).text = item.date
-        (v.findViewById(R.id.duration) as TextView).text = item.duration
+        (v.findViewById(android.R.id.text1) as TextView).text = item.date
+        (v.findViewById(android.R.id.text2) as TextView).text = item.duration
         return v
     }
 
