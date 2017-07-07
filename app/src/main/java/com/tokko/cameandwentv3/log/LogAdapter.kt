@@ -76,9 +76,9 @@ class LogAdapter(context: Context): BaseExpandableListAdapter() {
     override fun getChildView(groupPosition: Int, childPosition: Int, isLastChild: Boolean, convertView: View?, parent: ViewGroup?): View {
         val v = convertView ?: (context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater).inflate(R.layout.log_entry, null)
         val item = getChild(groupPosition, childPosition)
-        (v.findViewById(R.id.timestamp) as TextView).text = SimpleDateFormat("HH:mm:ss").format(item.timestamp) ?: ""
-        (v.findViewById(R.id.action) as TextView).text = if(item.entered) "Arrived" else "Departed"
-        (v.findViewById(R.id.project_name) as TextView).text = item.projectTitle
+        v.findViewById<TextView>(R.id.timestamp).text = SimpleDateFormat("HH:mm:ss").format(item.timestamp) ?: ""
+        v.findViewById<TextView>(R.id.action).text = if(item.entered) "Arrived" else "Departed"
+        v.findViewById<TextView>(R.id.project_name).text = item.projectTitle
         return v
     }
 
@@ -97,8 +97,8 @@ class LogAdapter(context: Context): BaseExpandableListAdapter() {
     override fun getGroupView(groupPosition: Int, isExpanded: Boolean, convertView: View?, parent: ViewGroup?): View {
         val v = convertView ?: (context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater).inflate(android.R.layout.simple_expandable_list_item_2, null)
         val item = getGroup(groupPosition)
-        (v.findViewById(android.R.id.text1) as TextView).text = item.date
-        (v.findViewById(android.R.id.text2) as TextView).text = item.duration
+        v.findViewById<TextView>(android.R.id.text1).text = item.date
+        v.findViewById<TextView>(android.R.id.text2).text = item.duration
         return v
     }
 

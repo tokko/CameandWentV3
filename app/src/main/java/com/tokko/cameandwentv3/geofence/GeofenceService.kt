@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.support.v4.app.NotificationCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
 import com.google.android.gms.location.*
@@ -94,7 +95,7 @@ class GeofenceService : IntentService("GeofenceService"), GoogleApiClient.Connec
                             val request = GeofencingRequest.Builder().setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER).addGeofences(geofences).build()
                             if (ContextCompat.checkSelfPermission(this@GeofenceService, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
                                     || ContextCompat.checkSelfPermission(this@GeofenceService, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                                val notification = Notification.Builder(this@GeofenceService)
+                                val notification = NotificationCompat.Builder(this@GeofenceService, NotificationChannel.DEFAULT_CHANNEL_ID)
                                         .setContentTitle("Requires more permissions")
                                         .setContentText("This app require permissions to access your location")
                                         .setSmallIcon(R.drawable.stat_sys_warning)

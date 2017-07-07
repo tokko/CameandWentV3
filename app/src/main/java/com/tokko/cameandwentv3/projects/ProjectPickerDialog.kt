@@ -28,8 +28,8 @@ class ProjectPickerDialog: DialogFragment() {
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         add_project!!.visibility = View.GONE
-        val listView = getView().findViewById(android.R.id.list) as ListView
-        listView.emptyView = list_empty
+
+        list.emptyView = list_empty
         listener = object: ValueEventListener{
             override fun onDataChange(p0: DataSnapshot?) {
                 val p = p0?.getValue(object: GenericTypeIndicator<HashMap<@JvmSuppressWildcards String, @JvmSuppressWildcards Project>>(){ })
@@ -39,15 +39,15 @@ class ProjectPickerDialog: DialogFragment() {
                     val adapter = object: ArrayAdapter<Project>(activity, android.R.layout.simple_list_item_1, android.R.id.text1, projects){
                         override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
                             val v = convertView ?: (activity.applicationContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater).inflate(android.R.layout.simple_list_item_1, null)
-                            (v.findViewById(android.R.id.text1) as TextView).text = getItem(position).title
+                            v.findViewById<TextView>(android.R.id.text1).text = getItem(position).title
                             return v
                         }
                     }
-                    listView.adapter = adapter
+                    list.adapter = adapter
                     val progressBar = ProgressBar(activity)
                     progressBar.isIndeterminate
-                    listView.emptyView = progressBar
-                    listView.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
+                    list.emptyView = progressBar
+                    list.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
                         targetFragment.onActivityResult(0, Activity.RESULT_OK, Intent().putExtra("project", projects!![position]))
                         dismiss()
                     }

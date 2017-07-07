@@ -64,7 +64,6 @@ class LoginActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedList
                             if (task.isSuccessful) {
                                 // Sign in success, update UI with the signed-in user's information
                                 Log.d("Auth", "signInWithCredential:success")
-                                val user = mAuth.currentUser
                                 initPostLogin()
                                 startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                                 finish()

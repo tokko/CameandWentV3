@@ -90,9 +90,9 @@ class ProjectEditFragment : Fragment(){
         title!!.setText(project!!.title)
         locationAdapter = object: ArrayAdapter<Project.ProjectLocation>(activity, android.R.layout.simple_list_item_1, android.R.id.text1, project!!.locations){
             override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-                var v = convertView ?: (activity.getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater).inflate(android.R.layout.simple_list_item_1, null)
-                var item = getItem(position)
-                (v!!.findViewById(android.R.id.text1) as TextView).text = item.longitude.toString() + "\n" + item.latitude
+                val v = convertView ?: (activity.getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater).inflate(android.R.layout.simple_list_item_1, null)
+                val item = getItem(position)
+                v!!.findViewById<TextView>(android.R.id.text1).text = item.longitude.toString() + "\n" + item.latitude
                 return v
             }
         }
