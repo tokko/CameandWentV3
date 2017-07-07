@@ -20,6 +20,7 @@ import kotlinx.android.synthetic.main.project_fragment.*
 class ProjectPickerDialog: DialogFragment() {
     var projects: List<Project>? = null
     var listener: ValueEventListener? = null
+    var dbRef = FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("projects")
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater!!.inflate(com.tokko.cameandwentv3.R.layout.project_fragment, null, false)
     }
@@ -29,7 +30,7 @@ class ProjectPickerDialog: DialogFragment() {
         add_project!!.visibility = View.GONE
         val listView = getView().findViewById(android.R.id.list) as ListView
         listView.emptyView = list_empty
-        object: ValueEventListener{
+        listener = object: ValueEventListener{
             override fun onDataChange(p0: DataSnapshot?) {
                 val p = p0?.getValue(object: GenericTypeIndicator<HashMap<@JvmSuppressWildcards String, @JvmSuppressWildcards Project>>(){ })
                 p?.entries?.stream()?.map { e -> e.value.id = e.key }
@@ -62,12 +63,12 @@ class ProjectPickerDialog: DialogFragment() {
 
     override fun onStart() {
         super.onStart()
-        FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("projects").addValueEventListener(listener)
+        dbRef.addValueEventListener(listener)
     }
 
     override fun onStop() {
         super.onStop()
-        FirebaseDatabase.getInstance().reference.removeEventListener(listener)
+        dbRef.removeEventListener(listener)
 
     }
 }

@@ -7,24 +7,18 @@ import java.util.concurrent.TimeUnit
 /**
  * Created by andreas on 6/07/17.
  */
-class Duration {
-    constructor(logs: Collection<LogEntry>){
-        this.logs = ArrayList<LogEntry>(logs)
-        date = SimpleDateFormat("yyyy:MM:dd").format(Date(logs.first().timestamp))
-        this.logs.sumBy { x -> if(x.entered) x.timestamp else -x.timestamp }
-        val duration = System.currentTimeMillis()
+class Duration(logs: Collection<LogEntry>) {
+    var duration: String
+    var logs: ArrayList<LogEntry> = ArrayList(logs)
+    var date: String = SimpleDateFormat("yyyy-MM-dd").format(Date(logs.first().timestamp))
+
+    init {
+        var duration = this.logs.fold(0L) { a, x -> a + if(x.entered) x.timestamp else -x.timestamp }
+        if(logs.size%2 != 0) duration -= System.currentTimeMillis()
+        duration = Math.abs(duration)
         val hours = TimeUnit.MILLISECONDS.toHours(duration)
         val minutes = TimeUnit.MILLISECONDS.toMinutes(duration - TimeUnit.HOURS.toMillis(hours))
         val seconds = TimeUnit.MILLISECONDS.toSeconds(duration - TimeUnit.HOURS.toMillis(hours) - TimeUnit.MINUTES.toMillis(minutes))
         this.duration = String.format("%02d:%02d:%02d", hours, minutes, seconds)
-    }
-    var duration: String
-    var logs: ArrayList<LogEntry>
-    var date: String
-
-    fun <T> ArrayList<T>.sumBy(sumFunction: (T) -> Long) : Long{
-        var sum: Long = 0
-        this.forEach{t-> sum += sumFunction(t)}
-        return sum
     }
 }
