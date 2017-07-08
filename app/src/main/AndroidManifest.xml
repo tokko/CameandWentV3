@@ -33,6 +33,8 @@
         <activity android:name=".projects.ProjectActivity" />
         <service android:name=".geofence.GeofenceService"/>
         <service android:name=".wifi.WifiClocker"/>
+        <service android:name=".projects.GeocodingService" />
+
         <receiver android:name=".wifi.WifiReceiver">
             <intent-filter>
                 <action android:name="android.net.ConnectivityManager.CONNECTIVITY_ACTION"/>

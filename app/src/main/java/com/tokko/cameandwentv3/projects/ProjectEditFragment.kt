@@ -15,7 +15,9 @@ import android.location.LocationManager
 import android.net.wifi.ScanResult
 import android.net.wifi.WifiManager
 import android.os.Bundle
+import android.os.Handler
 import android.os.Looper
+import android.os.ResultReceiver
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.text.Editable
@@ -93,7 +95,7 @@ class ProjectEditFragment : Fragment(){
             override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
                 val v = convertView ?: (activity.getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater).inflate(android.R.layout.simple_list_item_1, null)
                 val item = getItem(position)
-                v!!.findViewById<TextView>(android.R.id.text1).text = item.longitude.toString() + "\n" + item.latitude
+                v!!.findViewById<TextView>(android.R.id.text1).text = if(item.address == null) item.longitude.toString() + "\n" + item.latitude else item.address
                 return v
             }
         }
@@ -121,8 +123,7 @@ class ProjectEditFragment : Fragment(){
             }
         })
 
-        add_location!!.setOnClickListener {
-            getCurrentLocation() }
+        add_location!!.setOnClickListener { getCurrentLocation() }
         add_ssid!!.setOnClickListener { pickSSID() }
 
         locations.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
@@ -181,7 +182,16 @@ class ProjectEditFragment : Fragment(){
         if(location != null) {
             project!!.addLocation(location)
             locationAdapter!!.notifyDataSetChanged()
+            val resultReceiver: ResultReceiver = object : ResultReceiver(Handler()) {
+                override fun onReceiveResult(resultCode: Int, resultData: Bundle?) {
+                    project!!.locations.last().address = resultData!!.getString("address")
+                    locationAdapter!!.notifyDataSetChanged()
+                }
+            }
+
+            GeocodingService.startService(activity, project!!.id, location.latitude, location.longitude, resultReceiver)
         }
+
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>?, grantResults: IntArray?) {

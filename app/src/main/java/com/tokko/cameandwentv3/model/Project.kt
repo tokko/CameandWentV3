@@ -28,6 +28,7 @@ class Project : Serializable{
             this.longitude = longitude
         }
         var id : String = UUID.randomUUID().toString()
+        var address: String? = null
         var latitude: Double = 0.0
         var longitude: Double = 0.0
     }
