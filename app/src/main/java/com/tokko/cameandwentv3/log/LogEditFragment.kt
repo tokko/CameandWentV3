@@ -35,6 +35,7 @@ class LogEditFragment: Fragment() {
             return f
         }
     }
+    var endTimestamp: Long = 0
     var adapter: ArrayAdapter<Project>? = null
     var logEntry: LogEntry? = null
     var dbRef = FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("projects")
@@ -76,6 +77,13 @@ class LogEditFragment: Fragment() {
             timePickerDialog.setTargetFragment(this, 1)
             timePickerDialog.show(fragmentManager, "timepickerfragment")
         }
+        end_time_button.setOnCheckedChangeListener { compoundButton, isChecked ->
+            if(isChecked){
+                val timePickerDialog = TimePickerDialogFragment()
+                timePickerDialog.setTargetFragment(this, 2)
+                timePickerDialog.show(fragmentManager, "timepickerfragment")
+            }
+        }
         bindData()
     }
 
@@ -87,8 +95,17 @@ class LogEditFragment: Fragment() {
             1 -> {
                 setStartTime(data!!.getLongExtra(TimePickerDialogFragment.RESULT_TIME, 0))
             }
+            2 -> {
+                setEndTime(data!!.getLongExtra(TimePickerDialogFragment.RESULT_TIME, 0))
+            }
         }
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    private fun setEndTime(time: Long?) {
+        if(time != null)
+            endTimestamp = time
+        end_time_button.text = SimpleDateFormat("HH:mm").format(Date(DateTime(logEntry!!.timestamp).withTimeAtStartOfDay().millis + endTimestamp))
     }
 
     private fun setStartTime(time: Long?) {
