@@ -33,12 +33,20 @@ class WifiReceiver : BroadcastReceiver() {
                         clockoutLatestProject()
                     }
                     else{
-                        val project = projects.singleOrNull { p -> p.SSIDs.any { s -> s == ssid } }
-                        if(project != null) {
-                            val logEntry = LogEntry(System.currentTimeMillis(), true, project.id, project.title)
-                            FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentries").child(logEntry.id)
-                                    .setValue(logEntry)
-                        }
+                        FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentry").addListenerForSingleValueEvent(object: ValueEventListener{
+                            override fun onCancelled(p0: DatabaseError?) {}
+                            override fun onDataChange(p0: DataSnapshot?) {
+                                val logEntries = p0?.getValue(object: GenericTypeIndicator<java.util.HashMap<@kotlin.jvm.JvmSuppressWildcards String, @kotlin.jvm.JvmSuppressWildcards LogEntry>>(){ })?.values?.toList()
+                                if(logEntries != null && logEntries.sortedBy { it.timestamp }.last().entered) return
+                                val project = projects.singleOrNull { p -> p.SSIDs.any { s -> s == ssid } }
+                                if(project != null) {
+                                    val logEntry = LogEntry(System.currentTimeMillis(), true, project.id, project.title)
+                                    FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentries").child(logEntry.id)
+                                            .setValue(logEntry)
+                                }
+                            }
+                        })
+
                     }
                 } else {
 

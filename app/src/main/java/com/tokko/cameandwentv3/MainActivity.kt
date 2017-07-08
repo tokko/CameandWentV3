@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         currentFragment = if(savedInstanceState != null && savedInstanceState.containsKey("fragment")) fragmentManager.getFragment(savedInstanceState, "fragment") else LogListFragment()
-        fragmentManager.beginTransaction().replace(android.R.id.content, currentFragment).commit()
+        fragmentManager.beginTransaction().addToBackStack("sometag").replace(android.R.id.content, currentFragment).commit()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
