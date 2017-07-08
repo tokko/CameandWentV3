@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:title="Projects"
-        app:showAsAction="ifRoom"
+        app:showAsAction="never"
         android:id="@+id/edit_projevts"/>
     <item
         android:title="Summary"
