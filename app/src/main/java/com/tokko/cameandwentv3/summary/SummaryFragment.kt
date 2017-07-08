@@ -44,8 +44,8 @@ class SummaryFragment: Fragment() {
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        week_number?.text = "Week: " + summary!!.weekNumber
-        projectview?.text = "Project: " + summary!!.project
+        week_number?.text = "Week: " + summary?.weekNumber
+        projectview?.text = "Project: " + summary?.project
         adapter = object: ArrayAdapter<Duration>(activity, R.layout.duration){
             override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
                 val v = convertView ?: (activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater).inflate(R.layout.duration, null, false)
@@ -54,8 +54,9 @@ class SummaryFragment: Fragment() {
                 return v
             }
         }
-        if(view != null)
+        if(view != null) {
             view.findViewById<ListView>(R.id.list)?.adapter = adapter
+        }
         adapter!!.addAll(summary!!.durations)
         adapter!!.notifyDataSetChanged()
     }
