@@ -14,6 +14,7 @@ import com.tokko.cameandwentv3.model.LogEntry
 import com.tokko.cameandwentv3.model.Project
 import com.tokko.cameandwentv3.projects.ProjectPickerDialog
 import kotlinx.android.synthetic.main.log_list_fragment.*
+import org.joda.time.DateTime
 import org.joda.time.MutableDateTime
 import java.util.*
 
@@ -44,17 +45,16 @@ class LogListFragment: Fragment() {
                     if(toRemove.isNotEmpty()){
                         dbRef.removeEventListener(listener)
 
-                        toRemove.forEach { x -> dbRef.child(x.id).removeValue() }
+                        toRemove.forEach { dbRef.child(it.id).removeValue() }
+
                         dbRef.addValueEventListener(listener)
                         return
                     }
-                    logEntries = logEntries.toList().sortedBy { x -> x.timestamp }
+                    logEntries = logEntries.toList().sortedBy { it.timestamp }
 
                     //constructing durations
-                    val durations = logEntries.groupBy { le ->
-                        val dt = MutableDateTime(le.timestamp)
-                        dt.millisOfDay = 0
-                    }.map { x -> Duration(x.value) }.sortedBy { d -> d.date }
+                    val durations = logEntries.groupBy { DateTime(it.timestamp).withTimeAtStartOfDay().millis }
+                            .map { Duration(it.value) }.sortedBy {it.date }
                     adapter!!.clear()
                     adapter!!.addAll(durations)
                     val entered = durations.toList().last().logs.toList().sortedBy { x -> x.timestamp }.last().entered
