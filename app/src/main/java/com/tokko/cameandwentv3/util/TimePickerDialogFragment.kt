@@ -11,16 +11,16 @@ import org.joda.time.DateTime
 /**
  * Created by andre on 8/07/2017.
  */
-class TimePickerDialog: DialogFragment() {
+class TimePickerDialogFragment : DialogFragment() {
     companion object {
         val RESULT_TIME = "time"
     }
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val currentTime = DateTime(System.currentTimeMillis())
         val dialog = TimePickerDialog(activity, {_, hour, minute ->
-            targetFragment.onActivityResult(targetRequestCode, Activity.RESULT_OK, Intent().putExtra(RESULT_TIME, hour*60*60*1000+minute*60*1000))
-        }, currentTime.hourOfDay, currentTime.minuteOfDay, true)
-        dialog.setOnCancelListener{ dismiss()}
+            val i = hour * 60 * 60 * 1000 + minute * 60 * 1000
+            targetFragment.onActivityResult(targetRequestCode, Activity.RESULT_OK, Intent().putExtra(RESULT_TIME, i.toLong()))
+        }, currentTime.hourOfDay, currentTime.minuteOfHour, true)
         return dialog
     }
 }

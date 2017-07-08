@@ -1,6 +1,5 @@
 package com.tokko.cameandwentv3.log
 
-import android.app.DatePickerDialog
 import android.app.Fragment
 import android.content.Intent
 import android.os.Bundle
@@ -14,6 +13,7 @@ import com.tokko.cameandwentv3.R
 import com.tokko.cameandwentv3.model.LogEntry
 import com.tokko.cameandwentv3.model.Project
 import com.tokko.cameandwentv3.util.DatePickerDialogFragment
+import com.tokko.cameandwentv3.util.TimePickerDialogFragment
 import kotlinx.android.synthetic.main.log_edit_fragment.*
 import org.joda.time.DateTime
 import org.joda.time.MutableDateTime
@@ -71,20 +71,38 @@ class LogEditFragment: Fragment() {
             datePickerFragment.setTargetFragment(this, 0)
             datePickerFragment.show(fragmentManager, "datepickerfragment")
         }
+        start_time_button.setOnClickListener { _ ->
+            val timePickerDialog = TimePickerDialogFragment()
+            timePickerDialog.setTargetFragment(this, 1)
+            timePickerDialog.show(fragmentManager, "timepickerfragment")
+        }
         bindData()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when(requestCode){
             0 -> {
-                val dateTime = DateTime(logEntry!!.timestamp)
-                val newDateTime = MutableDateTime(data!!.getLongExtra(DatePickerDialogFragment.RESULT_DATE, 0))
-                newDateTime.setTime(dateTime.hourOfDay, dateTime.minuteOfHour, dateTime.secondOfMinute, dateTime.millisOfSecond)
-                logEntry!!.timestamp = newDateTime.millis
-                date_picker_button.text = SimpleDateFormat("yyyy-MM-dd").format(Date(logEntry!!.timestamp))
+                setDate(data!!.getLongExtra(DatePickerDialogFragment.RESULT_DATE, 0))
+            }
+            1 -> {
+                setStartTime(data!!.getLongExtra(TimePickerDialogFragment.RESULT_TIME, 0))
             }
         }
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    private fun setStartTime(time: Long?) {
+        if(time != null)
+            logEntry!!.timestamp = DateTime(logEntry!!.timestamp).withTimeAtStartOfDay().millis + time
+        start_time_button.text = SimpleDateFormat("HH:mm").format(Date(logEntry!!.timestamp))
+    }
+
+    private fun setDate(date: Long) {
+        val dateTime = DateTime(logEntry!!.timestamp)
+        val newDateTime = MutableDateTime(date)
+        newDateTime.setTime(dateTime.hourOfDay, dateTime.minuteOfHour, dateTime.secondOfMinute, dateTime.millisOfSecond)
+        logEntry!!.timestamp = newDateTime.millis
+        date_picker_button.text = SimpleDateFormat("yyyy-MM-dd").format(Date(logEntry!!.timestamp))
     }
 
     override fun onStart() {
@@ -99,5 +117,8 @@ class LogEditFragment: Fragment() {
     }
 
     private fun bindData() {
+        setDate(DateTime(if(logEntry!!.timestamp == 0L) System.currentTimeMillis() else logEntry!!.timestamp).withTimeAtStartOfDay().millis)
+        logEntry!!.timestamp = System.currentTimeMillis()
+        setStartTime(null)
     }
 }
