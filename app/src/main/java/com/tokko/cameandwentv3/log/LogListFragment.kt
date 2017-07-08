@@ -72,9 +72,7 @@ class LogListFragment: Fragment() {
         }
         clock_button.setOnClickListener { _ ->
             if(clock_button.isChecked) {
-                val projectPicker = ProjectPickerDialog()
-                projectPicker.setTargetFragment(this, 0)
-                projectPicker.show(activity.fragmentManager, "some tag")
+                fragmentManager.beginTransaction().addToBackStack("someothertag").replace(android.R.id.content, LogEditFragment()).commit()
             }
             else{
                 val item = adapter!!.getGroup(adapter!!.groupCount - 1).logs.toList().sortedBy { x -> x.timestamp }.last()

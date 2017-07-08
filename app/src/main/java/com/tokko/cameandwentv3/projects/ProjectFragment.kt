@@ -28,7 +28,7 @@ class ProjectFragment : ListFragment() {
         bus = (activity.application as MyApplication).bus
         listener = object : ValueEventListener {
            override fun onDataChange(p0: DataSnapshot?) {
-               var projects = p0?.getValue(object: GenericTypeIndicator<HashMap<@kotlin.jvm.JvmSuppressWildcards String, @kotlin.jvm.JvmSuppressWildcards Project>>(){ })
+               val projects = p0?.getValue(object: GenericTypeIndicator<HashMap<@kotlin.jvm.JvmSuppressWildcards String, @kotlin.jvm.JvmSuppressWildcards Project>>(){ })
                if(projects != null) {
                    adapter = ArrayAdapter<Project>(activity, android.R.layout.simple_list_item_1, android.R.id.text1, projects.values.toList())
                    listAdapter = adapter
