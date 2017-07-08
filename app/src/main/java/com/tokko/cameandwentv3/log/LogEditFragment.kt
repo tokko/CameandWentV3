@@ -38,6 +38,7 @@ class LogEditFragment: Fragment() {
     var endTimestamp: Long = 0
     var adapter: ArrayAdapter<Project>? = null
     var logEntry: LogEntry? = null
+    var edit: Boolean = false
     var dbRef = FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("projects")
     var listener: ValueEventListener = object: ValueEventListener{
         override fun onCancelled(p0: DatabaseError?) {}
@@ -46,13 +47,19 @@ class LogEditFragment: Fragment() {
             if(projects != null){
                 adapter = ArrayAdapter<Project>(activity, android.R.layout.simple_spinner_dropdown_item, android.R.id.text1, projects.toList())
                 project_picker.adapter = adapter
+                if(logEntry!!.projectId != ""){
+                    project_picker.setSelection(projects.indexOf(projects.find { it.id == logEntry!!.projectId }))
+                }
             }
 
         }
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        logEntry = (savedInstanceState ?: arguments)?.getSerializable(ARG_LOG_ENTRY) as? LogEntry ?: LogEntry()
+        logEntry = (savedInstanceState ?: arguments)?.getSerializable(ARG_LOG_ENTRY) as? LogEntry
+        edit = logEntry != null
+        if(logEntry == null)
+            logEntry = LogEntry()
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {
@@ -97,6 +104,10 @@ class LogEditFragment: Fragment() {
                 dbRef.child(endLog.id).setValue(endLog)
             }
             fragmentManager.popBackStack()
+        }
+        if(edit) {
+            end_time_button.visibility = View.GONE
+            punch_out_label.visibility = View.GONE
         }
     }
 
@@ -148,7 +159,6 @@ class LogEditFragment: Fragment() {
 
     private fun bindData() {
         setDate(DateTime(if(logEntry!!.timestamp == 0L) System.currentTimeMillis() else logEntry!!.timestamp).withTimeAtStartOfDay().millis)
-        logEntry!!.timestamp = System.currentTimeMillis()
         setStartTime(null)
     }
 }
