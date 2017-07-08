@@ -23,6 +23,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import android.widget.Toast
@@ -123,6 +124,29 @@ class ProjectEditFragment : Fragment(){
         add_location!!.setOnClickListener {
             getCurrentLocation() }
         add_ssid!!.setOnClickListener { pickSSID() }
+
+        locations.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
+            val builder = AlertDialog.Builder(activity)
+                    .setTitle("Delete item?")
+                    .setMessage("Are you sure?")
+                    .setNegativeButton("No, I'm scared :(", { _, _ -> ; })
+                    .setPositiveButton("Yes!", { _, _ ->
+                        project!!.locations.remove(project!!.locations[position])
+                        locationAdapter!!.notifyDataSetChanged()
+                    })
+            builder.show()
+        }
+        ssids.onItemClickListener = AdapterView.OnItemClickListener{ _, _, position, _ ->
+            val builder = AlertDialog.Builder(activity)
+                    .setTitle("Delete item?")
+                    .setMessage("Are you sure?")
+                    .setNegativeButton("No, I'm scared :(", {_, _ -> ;})
+                    .setPositiveButton("Yes!", { _, _ ->
+                        project!!.SSIDs.remove(project!!.SSIDs[position])
+                        SSIDAdapter!!.notifyDataSetChanged()
+                    })
+            builder.show()
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
