@@ -17,20 +17,22 @@ class MyApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+    }
 
+    private fun mockData() {
         val dbRef = FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentries")
-        dbRef.addListenerForSingleValueEvent(object: ValueEventListener{
+        dbRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError?) {
                 TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
             }
 
             override fun onDataChange(p0: DataSnapshot?) {
-                val logEntries = p0?.getValue(object: GenericTypeIndicator<HashMap<@kotlin.jvm.JvmSuppressWildcards String, @kotlin.jvm.JvmSuppressWildcards LogEntry>>(){ })?.values?.toList()
+                val logEntries = p0?.getValue(object : GenericTypeIndicator<HashMap<@kotlin.jvm.JvmSuppressWildcards String, @kotlin.jvm.JvmSuppressWildcards LogEntry>>() {})?.values?.toList()
 
                 logEntries?.forEach { x -> dbRef.child(x.id).removeValue() }
                 val mutableDateTime = MutableDateTime(System.currentTimeMillis())
                 mutableDateTime.addMonths(-8)
-                while(mutableDateTime.millis <= System.currentTimeMillis()){
+                while (mutableDateTime.millis <= System.currentTimeMillis()) {
                     mutableDateTime.setTime(8, 0, 0, 0)
                     var log = LogEntry(mutableDateTime.millis, true, "someproject", "someproject")
                     dbRef.child(log.id).setValue(log)
@@ -46,6 +48,5 @@ class MyApplication : Application() {
                 }
             }
         })
-
     }
 }
