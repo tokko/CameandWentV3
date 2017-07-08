@@ -26,18 +26,22 @@ class MyApplication : Application() {
                 val logEntries = p0?.getValue(object: GenericTypeIndicator<HashMap<@kotlin.jvm.JvmSuppressWildcards String, @kotlin.jvm.JvmSuppressWildcards LogEntry>>(){ })?.values?.toList()
 
                 logEntries?.forEach { x -> dbRef.child(x.id).removeValue() }
-                val dt = MutableDateTime(System.currentTimeMillis())
-                var log = LogEntry(dt.millis, true, "someid", "someproject")
-                dbRef.child(log.id).setValue(log)
-                dt.addHours(1)
-                log = LogEntry(dt.millis, false, "someid", "someproject")
-                dbRef.child(log.id).setValue(log)
-                dt.addDays(-1)
-                log = LogEntry(dt.millis, true, "someid", "someproject")
-                dbRef.child(log.id).setValue(log)
-                dt.addHours(1)
-                log = LogEntry(dt.millis, false, "someid", "someproject")
-                dbRef.child(log.id).setValue(log)
+                val mutableDateTime = MutableDateTime(System.currentTimeMillis())
+                mutableDateTime.addMonths(-4)
+                while(mutableDateTime.millis <= System.currentTimeMillis()){
+                    mutableDateTime.setTime(8, 0, 0, 0)
+                    var log = LogEntry(mutableDateTime.millis, true, "someproject", "someproject")
+                    dbRef.child(log.id).setValue(log)
+                    mutableDateTime.setTime(12, 0, 0, 0)
+                    log = LogEntry(mutableDateTime.millis, false, "someproject", "someproject")
+                    dbRef.child(log.id).setValue(log)
+                    log = LogEntry(mutableDateTime.millis, true, "someproject2", "someproject2")
+                    dbRef.child(log.id).setValue(log)
+                    mutableDateTime.setTime(17, 0, 0, 0)
+                    log = LogEntry(mutableDateTime.millis, false, "someproject", "someproject")
+                    dbRef.child(log.id).setValue(log)
+                    mutableDateTime.addDays(1)
+                }
             }
         })
 

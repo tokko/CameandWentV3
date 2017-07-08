@@ -111,12 +111,12 @@ class GeofenceService : IntentService("GeofenceService"), GoogleApiClient.Connec
                         }
                     }
                 })
-
     }
 
     private fun pendingIntent() = PendingIntent.getService(this, 0, Intent(this, GeofenceService::class.java), PendingIntent.FLAG_UPDATE_CURRENT)
 
     private fun unRegisterGeofences(){
-        LocationServices.GeofencingApi.removeGeofences(client, pendingIntent())
+        if(!client!!.isConnected)
+            LocationServices.GeofencingApi.removeGeofences(client, pendingIntent())
     }
 }
