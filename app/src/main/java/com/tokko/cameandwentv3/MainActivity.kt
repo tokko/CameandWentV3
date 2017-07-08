@@ -8,6 +8,7 @@ import com.tokko.cameandwentv3.log.LogListFragment
 import android.view.Menu
 import android.view.MenuItem
 import com.tokko.cameandwentv3.projects.ProjectActivity
+import com.tokko.cameandwentv3.summary.SummaryActivity
 
 /**
  * Created by andre on 10/06/2017.
@@ -30,6 +31,10 @@ class MainActivity : AppCompatActivity() {
         when(item!!.itemId){
             R.id.edit_projevts -> {
                 startActivity(Intent(this, ProjectActivity::class.java))
+                return true
+            }
+            R.id.view_summary -> {
+                startActivity(Intent(this, SummaryActivity::class.java))
                 return true
             }
         }

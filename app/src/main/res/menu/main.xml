@@ -5,4 +5,8 @@
         android:title="Projects"
         app:showAsAction="ifRoom"
         android:id="@+id/edit_projevts"/>
+    <item
+        android:title="Summary"
+        app:showAsAction="ifRoom"
+        android:id="@+id/view_summary"/>
 </menu>
