@@ -58,7 +58,7 @@ class LogEditFragment: Fragment() {
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        cancel_button.setOnClickListener { fragmentManager.popBackStack() }
         bindData()
     }
 
