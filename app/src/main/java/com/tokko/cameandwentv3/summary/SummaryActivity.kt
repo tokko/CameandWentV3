@@ -38,6 +38,7 @@ class SummaryActivity: AppCompatActivity() {
                     //constructing durations
                     val startOfLastMonthMutable = MutableDateTime(System.currentTimeMillis())
                     startOfLastMonthMutable.addMonths(-1)
+                    startOfLastMonthMutable.dayOfMonth = 1
                     val startOfLastMonth = startOfLastMonthMutable.toDateTime().withTimeAtStartOfDay().millis
                     val summaries = logEntries.toList()
                             .sortedBy { it.timestamp }

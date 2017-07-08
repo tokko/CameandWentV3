@@ -17,4 +17,8 @@ class SummaryFragmentAdapter(fm: FragmentManager, val summaries: List<Summary>):
     override fun getCount(): Int {
         return summaries.size
     }
+
+    override fun getPageTitle(position: Int): CharSequence {
+        return summaries[position].project + " W:" + summaries[position].weekNumber
+    }
 }
