@@ -1,6 +1,8 @@
 package com.tokko.cameandwentv3.log
 
+import android.app.DatePickerDialog
 import android.app.Fragment
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,7 +13,12 @@ import com.google.firebase.database.*
 import com.tokko.cameandwentv3.R
 import com.tokko.cameandwentv3.model.LogEntry
 import com.tokko.cameandwentv3.model.Project
+import com.tokko.cameandwentv3.util.DatePickerDialogFragment
 import kotlinx.android.synthetic.main.log_edit_fragment.*
+import org.joda.time.DateTime
+import org.joda.time.MutableDateTime
+import java.sql.Date
+import java.text.SimpleDateFormat
 
 /**
  * Created by andre on 8/07/2017.
@@ -59,7 +66,25 @@ class LogEditFragment: Fragment() {
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         cancel_button.setOnClickListener { fragmentManager.popBackStack() }
+        date_picker_button.setOnClickListener { _ ->
+            val datePickerFragment = DatePickerDialogFragment()
+            datePickerFragment.setTargetFragment(this, 0)
+            datePickerFragment.show(fragmentManager, "datepickerfragment")
+        }
         bindData()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        when(requestCode){
+            0 -> {
+                val dateTime = DateTime(logEntry!!.timestamp)
+                val newDateTime = MutableDateTime(data!!.getLongExtra(DatePickerDialogFragment.RESULT_DATE, 0))
+                newDateTime.setTime(dateTime.hourOfDay, dateTime.minuteOfHour, dateTime.secondOfMinute, dateTime.millisOfSecond)
+                logEntry!!.timestamp = newDateTime.millis
+                date_picker_button.text = SimpleDateFormat("yyyy-MM-dd").format(Date(logEntry!!.timestamp))
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun onStart() {
