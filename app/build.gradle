@@ -24,7 +24,7 @@ android {
         applicationId "com.tokko.cameandwentv3"
         minSdkVersion 24
         targetSdkVersion 26
-        versionCode = (System.getenv("BITRISE_BUILD_NUMBER") ?: "4") as Integer
+        versionCode = (System.getenv("BITRISE_BUILD_NUMBER") ?: "81") as Integer
         versionName "1.0"
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
