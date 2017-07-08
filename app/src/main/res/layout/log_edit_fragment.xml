@@ -65,6 +65,13 @@
         <Button
             android:layout_width="0dp"
             android:layout_weight="1"
+            android:id="@+id/delete_button"
+            android:text="Delete"
+            android:visibility="gone"
+            android:layout_height="wrap_content" />
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:id="@+id/ok_button"
             android:text="@android:string/ok"
             android:layout_height="wrap_content" />

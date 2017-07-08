@@ -94,7 +94,7 @@ class LogEditFragment: Fragment() {
         bindData()
         ok_button.setOnClickListener { _ ->
             val project = adapter!!.getItem(project_picker.selectedItemPosition)
-            logEntry!!.id = project.id
+            logEntry!!.projectId = project.id
             logEntry!!.projectTitle = project.title
             logEntry!!.entered = true
             val dbRef = FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentries")
@@ -105,9 +105,14 @@ class LogEditFragment: Fragment() {
             }
             fragmentManager.popBackStack()
         }
+        delete_button.setOnClickListener { _ ->
+            FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentries").child(logEntry!!.id).removeValue()
+            fragmentManager.popBackStack()
+        }
         if(edit) {
             end_time_button.visibility = View.GONE
             punch_out_label.visibility = View.GONE
+            delete_button.visibility = View.VISIBLE
         }
     }
 
@@ -159,6 +164,8 @@ class LogEditFragment: Fragment() {
 
     private fun bindData() {
         setDate(DateTime(if(logEntry!!.timestamp == 0L) System.currentTimeMillis() else logEntry!!.timestamp).withTimeAtStartOfDay().millis)
+        if(!edit)
+            logEntry!!.timestamp = System.currentTimeMillis()
         setStartTime(null)
     }
 }
