@@ -57,11 +57,14 @@ class LogListFragment: Fragment() {
                             .map { Duration(it.value) }.sortedBy {it.date }
                     adapter!!.clear()
                     adapter!!.addAll(durations)
+                    adapter!!.notifyDataSetChanged()
                     val entered = durations.toList().last().logs.toList().sortedBy { x -> x.timestamp }.last().entered
                     clock_button!!.isChecked = entered
                     loglist.expandGroup(adapter?.groupCount!!.minus(1))
                 }
                 else{
+                    adapter!!.clear()
+                    adapter!!.notifyDataSetInvalidated()
                     list_empty!!.visibility = View.GONE
                     clock_button.isChecked = false
                 }

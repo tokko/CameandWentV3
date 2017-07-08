@@ -81,17 +81,18 @@ class GeofenceService : IntentService("GeofenceService"), GoogleApiClient.Connec
                     override fun onDataChange(p0: DataSnapshot?) {
                         val projects = p0?.getValue(object : GenericTypeIndicator<HashMap<@JvmSuppressWildcards String, @JvmSuppressWildcards Project>>() {})
                         if (projects != null) {
-                            val geofences = projects.values.stream().flatMap { p ->
+                            val geofences = projects.values.stream().filter { x -> x.locations.any() }.flatMap { p ->
                                 p.locations.stream().map { l ->
                                     Geofence.Builder()
                                             .setRequestId(p.id + ":" + l.id + ":" + p.title)
                                             .setCircularRegion(l.latitude, l.longitude, 100F)
                                             .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER + Geofence.GEOFENCE_TRANSITION_EXIT)
                                             .setExpirationDuration(Geofence.NEVER_EXPIRE)
-                                            //.setLoiteringDelay(1000*60*5)
+                                            .setLoiteringDelay(1000*60*5)
                                             .build()
                                 }
                             }.collect(Collectors.toList())
+                            if(geofences.isEmpty()) return
                             val request = GeofencingRequest.Builder().setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER).addGeofences(geofences).build()
                             if (ContextCompat.checkSelfPermission(this@GeofenceService, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
                                     || ContextCompat.checkSelfPermission(this@GeofenceService, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {

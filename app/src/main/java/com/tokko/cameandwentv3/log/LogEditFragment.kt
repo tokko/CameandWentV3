@@ -85,6 +85,19 @@ class LogEditFragment: Fragment() {
             }
         }
         bindData()
+        ok_button.setOnClickListener { _ ->
+            val project = adapter!!.getItem(project_picker.selectedItemPosition)
+            logEntry!!.id = project.id
+            logEntry!!.projectTitle = project.title
+            logEntry!!.entered = true
+            val dbRef = FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentries")
+            dbRef.child(logEntry!!.id).setValue(logEntry)
+            if(endTimestamp != 0L){
+                val endLog = LogEntry(DateTime(logEntry!!.timestamp).withMillisOfDay(endTimestamp.toInt()).millis, false, logEntry!!.projectId, logEntry!!.projectTitle)
+                dbRef.child(endLog.id).setValue(endLog)
+            }
+            fragmentManager.popBackStack()
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
