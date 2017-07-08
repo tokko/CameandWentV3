@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ExpandableListView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.tokko.cameandwentv3.R
@@ -75,12 +76,16 @@ class LogListFragment: Fragment() {
         }
         clock_button.setOnClickListener { _ ->
             if(clock_button.isChecked) {
-                fragmentManager.beginTransaction().addToBackStack("someothertag").replace(android.R.id.content, LogEditFragment()).commit()
+                fragmentManager.beginTransaction().addToBackStack("someothertag").replace(android.R.id.content, LogEditFragment.newInstance(null)).commit()
             }
             else{
                 val item = adapter!!.getGroup(adapter!!.groupCount - 1).logs.toList().sortedBy { x -> x.timestamp }.last()
                 clockin(item.projectId, item.projectTitle, false)
             }
+        }
+        loglist.setOnChildClickListener { _, _, groupPosition, childPosition, _ ->
+            fragmentManager.beginTransaction().addToBackStack("someothertag").replace(android.R.id.content, LogEditFragment.newInstance(adapter!!.getChild(groupPosition, childPosition))).commit()
+            true
         }
     }
 
