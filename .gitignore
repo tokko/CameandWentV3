@@ -8,3 +8,7 @@
 /captures
 .externalNativeBuild
 /.idea/
+keystore
+gradle.properties
+app/Google Play Android Developer-6a98ff7277b6.p12
+app/google-services.json
