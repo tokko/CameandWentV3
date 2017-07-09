@@ -5,16 +5,19 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.github.triplet.play'
 android {
     signingConfigs {
+        def props = new Properties()
+        file("../gradle.properties").withInputStream { props.load(it) }
+
         release {
             keyAlias 'release'
             storeFile file('../keystore')
-            keyPassword keyPassword
-            storePassword storePassword
+            keyPassword props.getProperty("keyPassword")
+            storePassword props.getProperty("storePassword")
         }
         debug {
             keyAlias 'debug'
-            keyPassword keyPassword
-            storePassword storePassword
+            keyPassword props.getProperty("keyPassword")
+            storePassword props.getProperty("storePassword")
             storeFile file('../keystore')
         }
     }
