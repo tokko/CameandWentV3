@@ -8,7 +8,7 @@ import kotlin.collections.ArrayList
  * Created by andreas on 7/07/17.
  */
 class LogCleaner {
-    fun clean(logEntries: List<LogEntry>) : List<LogEntry>{
+    fun clean(logEntries: List<LogEntry>) : Pair<List<LogEntry>, List<LogEntry>>{
         val stack = Stack<LogEntry>()
         val ret = ArrayList<LogEntry>()
         ret.addAll(logEntries.sortedBy { it.timestamp }.takeWhile { !it.entered })
@@ -20,7 +20,8 @@ class LogCleaner {
             if(top.entered == stack.peek().entered)
                 ret.add(top)
         }
-
-        return ret
+        val cleanedList = ArrayList(logEntries)
+        cleanedList.removeAll(ret)
+        return Pair(cleanedList, ret)
     }
 }

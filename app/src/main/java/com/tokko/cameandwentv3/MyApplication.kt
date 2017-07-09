@@ -9,6 +9,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.squareup.otto.Bus
 import com.tokko.cameandwentv3.model.LogEntry
+import com.tokko.cameandwentv3.notifications.CountdownNotificationService
 import org.joda.time.MutableDateTime
 import java.util.HashMap
 
@@ -20,24 +21,10 @@ class MyApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentries").addValueEventListener(object: ValueEventListener{
-            override fun onCancelled(p0: DatabaseError?) {}
-            override fun onDataChange(p0: DataSnapshot?) {
-                val logEntries = p0?.getValue(object : GenericTypeIndicator<HashMap<@kotlin.jvm.JvmSuppressWildcards String, @kotlin.jvm.JvmSuppressWildcards LogEntry>>() {})?.values?.toList()
-                if(logEntries != null){
-                    val am = getSystemService(AudioManager::class.java)
-                    if(logEntries.last().entered){
-                        val currentSoundMode = am.ringerMode
-                        getSharedPreferences("sound", Context.MODE_PRIVATE).edit().putInt("ringermode", currentSoundMode).apply()
-                        am.ringerMode = AudioManager.RINGER_MODE_VIBRATE
-                    }
-                    else{
-                        am.ringerMode = getSharedPreferences("sound", Context.MODE_PRIVATE).getInt("ringermode", AudioManager.RINGER_MODE_NORMAL)
-                    }
-                }
-            }
-        })
+
     }
+
+
 
     private fun mockData() {
         val dbRef = FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentries")

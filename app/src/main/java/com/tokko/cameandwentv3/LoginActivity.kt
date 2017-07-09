@@ -1,7 +1,9 @@
 package com.tokko.cameandwentv3
 
+import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.media.AudioManager
 import android.net.ConnectivityManager
 import android.os.Bundle
 import android.support.v4.app.FragmentActivity
@@ -13,8 +15,12 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.database.*
 import com.tokko.cameandwentv3.geofence.GeofenceService
+import com.tokko.cameandwentv3.model.LogEntry
+import com.tokko.cameandwentv3.notifications.CountdownNotificationService
 import com.tokko.cameandwentv3.wifi.WifiReceiver
+import java.util.HashMap
 
 
 /**
@@ -84,11 +90,29 @@ class LoginActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedList
             }
         }
     }
-
+    private fun setupSoundToggling() {
+        FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentries").addValueEventListener(object : ValueEventListener {
+            override fun onCancelled(p0: DatabaseError?) {}
+            override fun onDataChange(p0: DataSnapshot?) {
+                val logEntries = p0?.getValue(object : GenericTypeIndicator<HashMap<@kotlin.jvm.JvmSuppressWildcards String, @kotlin.jvm.JvmSuppressWildcards LogEntry>>() {})?.values?.toList()
+                if (logEntries != null) {
+                    val am = getSystemService(AudioManager::class.java)
+                    if (logEntries.last().entered) {
+                        val currentSoundMode = am.ringerMode
+                        getSharedPreferences("sound", Context.MODE_PRIVATE).edit().putInt("ringermode", currentSoundMode).apply()
+                        am.ringerMode = AudioManager.RINGER_MODE_VIBRATE
+                    } else {
+                        am.ringerMode = getSharedPreferences("sound", Context.MODE_PRIVATE).getInt("ringermode", AudioManager.RINGER_MODE_NORMAL)
+                    }
+                }
+            }
+        })
+    }
     private fun initPostLogin() {
         GeofenceService.initGeofences(applicationContext)
         applicationContext.registerReceiver(WifiReceiver(), IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
-
+        setupSoundToggling()
+        CountdownNotificationService.initialize(applicationContext)
     }
 
 }
