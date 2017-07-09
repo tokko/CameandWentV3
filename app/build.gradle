@@ -11,7 +11,7 @@ android {
             keyPassword keyPassword
             storePassword storePassword
         }
-    release {
+        debug {
             keyAlias 'debug'
             keyPassword keyPassword
             storePassword storePassword
