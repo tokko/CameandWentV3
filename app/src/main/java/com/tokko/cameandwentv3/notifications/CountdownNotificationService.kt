@@ -29,9 +29,9 @@ class CountdownNotificationService: IntentService("CountdownNotificationService"
         FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentries").addValueEventListener(object: ValueEventListener{
             override fun onCancelled(p0: DatabaseError?) {}
             override fun onDataChange(p0: DataSnapshot?) {
-                val logEntries = ArrayList(p0?.getValue(object: GenericTypeIndicator<HashMap<@kotlin.jvm.JvmSuppressWildcards String, @kotlin.jvm.JvmSuppressWildcards LogEntry>>(){ })?.values?.sortedBy { it.timestamp }?.toList())
+                val logEntries = p0?.getValue(object: GenericTypeIndicator<HashMap<@kotlin.jvm.JvmSuppressWildcards String, @kotlin.jvm.JvmSuppressWildcards LogEntry>>(){ })?.values?.sortedBy { it.timestamp }?.toList()
                 val nm = getSystemService(NotificationManager::class.java)
-                if(logEntries.isNotEmpty()) {
+                if(logEntries != null) {
                     val (cleaned, _) = LogCleaner().clean(logEntries.toList())
                     if(cleaned.last().entered){
                         val today = DateTime(System.currentTimeMillis()).withTimeAtStartOfDay().millis
