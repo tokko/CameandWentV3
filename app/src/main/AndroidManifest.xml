@@ -33,6 +33,7 @@
         <activity android:name=".projects.ProjectActivity" />
         <service android:name=".geofence.GeofenceService"/>
         <service android:name=".projects.GeocodingService" />
+        <service android:name=".notifications.CountdownNotificationService" />
 
         <receiver android:name=".wifi.WifiReceiver">
             <intent-filter>
