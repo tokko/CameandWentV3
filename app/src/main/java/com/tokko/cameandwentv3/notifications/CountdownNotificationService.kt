@@ -20,7 +20,7 @@ import org.joda.time.DateTime
  */
 class CountdownNotificationService: IntentService("CountdownNotificationService") {
     companion object {
-        val ACTION_START = "com.tokko.cameandwentv3.countdownnotificationservices.ACTION_START"
+        val ACTION_START = "com.tokko.cameandwentv3.countdownnotificationservices.ACTION_UPDATE"
         fun initialize(context: Context){
             context.applicationContext.startService(Intent(context.applicationContext, CountdownNotificationService::class.java).setAction(ACTION_START))
         }
