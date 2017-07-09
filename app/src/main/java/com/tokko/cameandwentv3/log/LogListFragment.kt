@@ -42,7 +42,7 @@ class LogListFragment: Fragment() {
                 var logEntries = p0?.getValue(object: GenericTypeIndicator<HashMap<@kotlin.jvm.JvmSuppressWildcards String, @kotlin.jvm.JvmSuppressWildcards LogEntry>>(){ })?.values?.toList()
                 if(logEntries != null){
                     //cleaning data
-                    val toRemove = LogCleaner().clean(logEntries.toList())
+                    val (_, toRemove) = LogCleaner().clean(logEntries.toList())
                     if(toRemove.isNotEmpty()){
                         dbRef.removeEventListener(listener)
 

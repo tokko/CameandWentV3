@@ -13,4 +13,10 @@ class LogEntry(timeStamp: Long, entered: Boolean, projectId: String?, projectTit
     var entered: Boolean = entered
     var projectId: String = projectId ?: ""
     var projectTitle: String = projectTitle ?: ""
+
+    override fun equals(other: Any?): Boolean {
+        if(other is LogEntry)
+            return id == other.id
+        return false
+    }
 }
