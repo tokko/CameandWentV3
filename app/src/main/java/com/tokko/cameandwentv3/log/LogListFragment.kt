@@ -6,17 +6,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ExpandableListView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.tokko.cameandwentv3.R
 import com.tokko.cameandwentv3.model.Duration
 import com.tokko.cameandwentv3.model.LogEntry
 import com.tokko.cameandwentv3.model.Project
-import com.tokko.cameandwentv3.projects.ProjectPickerDialog
+import com.tokko.cameandwentv3.settings.SettingsActivity
 import kotlinx.android.synthetic.main.log_list_fragment.*
 import org.joda.time.DateTime
-import org.joda.time.MutableDateTime
 import java.util.*
 
 
@@ -55,7 +53,7 @@ class LogListFragment: Fragment() {
 
                     //constructing durations
                     val durations = logEntries.groupBy { DateTime(it.timestamp).withTimeAtStartOfDay().millis }
-                            .map { Duration(it.value) }.sortedBy {it.date }
+                            .map { Duration(it.value, SettingsActivity.getConsultRounding(activity)) }.sortedBy {it.date }
                     adapter!!.clear()
                     adapter!!.addAll(durations)
                     adapter!!.notifyDataSetChanged()
