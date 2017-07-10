@@ -3,6 +3,7 @@ package com.tokko.cameandwentv3.notifications
 import android.R
 import android.app.Notification
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -11,6 +12,7 @@ import android.os.IBinder
 import android.support.v4.app.NotificationCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import com.tokko.cameandwentv3.MainActivity
 import com.tokko.cameandwentv3.log.LogCleaner
 import com.tokko.cameandwentv3.model.LogEntry
 import com.tokko.cameandwentv3.model.toHourMinute
@@ -88,6 +90,7 @@ class CountdownNotificationService: Service(){
         builder.setSmallIcon(R.drawable.ic_dialog_alert)
         builder.setOngoing(true)
         builder.setProgress(max, duration.toInt(), false)
+        builder.setContentIntent(PendingIntent.getActivity(applicationContext, 0, Intent(applicationContext, MainActivity::class.java), 0))
         val notification = builder.build()
         nm.notify(0, notification)
     }
