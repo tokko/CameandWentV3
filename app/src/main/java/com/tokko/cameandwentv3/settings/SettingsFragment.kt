@@ -25,7 +25,7 @@ class SettingsFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val prefs = activity.getSharedPreferences("settings", Context.MODE_PRIVATE)
         consult_rounding.isChecked = prefs.getBoolean("consultrounding", true)
-        automaticbreak.setText(prefs.getInt("automaticbreaks", 30).toString())
+        automaticbreak.setText(prefs.getInt("automaticbreaks", 0).toString())
     }
     override fun onPause() {
         super.onPause()

@@ -44,7 +44,7 @@ class SummaryActivity: AppCompatActivity() {
                             .takeLastWhile { it.timestamp > startOfLastMonth }
                             .groupBy { DateTime(it.timestamp).withDayOfWeek(1).withTimeAtStartOfDay().millis }
                             .flatMap {x -> x.value.groupBy { y -> y.projectTitle }.map { z -> Summary(x.key, z.key, z.value.groupBy { DateTime(it.timestamp).withTimeAtStartOfDay().millis }
-                                    .map { Duration(it.value, SettingsActivity.getConsultRounding(this@SummaryActivity)) }.toList()) } }
+                                    .map { Duration(it.value, SettingsActivity.getConsultRounding(this@SummaryActivity), SettingsActivity.getAutomaticBreakDuration(this@SummaryActivity)) }.toList()) } }
                     vpPager.adapter = SummaryFragmentAdapter(supportFragmentManager, summaries)
                 }
             }
