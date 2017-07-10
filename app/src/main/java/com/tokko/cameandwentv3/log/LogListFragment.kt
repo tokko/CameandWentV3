@@ -53,7 +53,7 @@ class LogListFragment: Fragment() {
 
                     //constructing durations
                     val durations = logEntries.groupBy { DateTime(it.timestamp).withTimeAtStartOfDay().millis }
-                            .map { Duration(it.value, SettingsActivity.getConsultRounding(activity)) }.sortedBy {it.date }
+                            .map { Duration(it.value, SettingsActivity.getConsultRounding(activity), SettingsActivity.getAutomaticBreakDuration(activity)) }.sortedBy {it.date }
                     adapter!!.clear()
                     adapter!!.addAll(durations)
                     adapter!!.notifyDataSetChanged()

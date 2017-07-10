@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit
 /**
  * Created by andreas on 6/07/17.
  */
-class Duration(logs: Collection<LogEntry>, consultRounding: Boolean) {
+class Duration(logs: Collection<LogEntry>, consultRounding: Boolean, automaticBreaks: Int) {
     var duration: String
     var logs: ArrayList<LogEntry> = ArrayList(logs)
     var date: String = SimpleDateFormat("yyyy-MM-dd").format(Date(logs.first().timestamp))
@@ -19,6 +19,9 @@ class Duration(logs: Collection<LogEntry>, consultRounding: Boolean) {
         duration = Math.abs(duration)
         if(consultRounding)
             duration = (((duration+millisIn30Minutes)/millisIn30Minutes)*millisIn30Minutes)
+        val reduction = 1000 * 60 * automaticBreaks
+        if(reduction >= duration)
+            duration -= reduction
         this.duration = duration.toHourMinuteSeconds()
     }
 
