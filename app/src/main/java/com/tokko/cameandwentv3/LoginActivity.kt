@@ -18,9 +18,11 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.database.*
 import com.tokko.cameandwentv3.geofence.GeofenceService
 import com.tokko.cameandwentv3.model.LogEntry
+import com.tokko.cameandwentv3.model.Setting
 import com.tokko.cameandwentv3.notifications.CountdownNotificationService
+import com.tokko.cameandwentv3.settings.SettingsActivity
 import com.tokko.cameandwentv3.wifi.WifiReceiver
-import java.util.HashMap
+import java.util.*
 
 
 /**
@@ -113,6 +115,20 @@ class LoginActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedList
         applicationContext.registerReceiver(WifiReceiver(), IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
         setupSoundToggling()
         CountdownNotificationService.initialize(applicationContext)
+        setupSettingSync()
+    }
+
+    private fun setupSettingSync() {
+        FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("settings").addValueEventListener(object: ValueEventListener{
+            override fun onCancelled(p0: DatabaseError?) {}
+            override fun onDataChange(p0: DataSnapshot?) {
+                val setting = p0?.getValue(Setting::class.java)
+                if(setting != null){
+                    SettingsActivity.setAutomaticBreakDuration(applicationContext, setting.automaticBreak)
+                    SettingsActivity.setConsultRounding(applicationContext,  setting.consultRounding)
+                }
+            }
+        })
     }
 
 }

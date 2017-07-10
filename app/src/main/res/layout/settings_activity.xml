@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:text="Automatic lunch break duration"
+        android:layout_height="wrap_content" />
+    <EditText
+        android:layout_width="match_parent"
+        android:id="@+id/automaticbreak"
+        android:hint="Break duration"
+        android:text="30"
+        android:layout_height="wrap_content" />
+
+    <CheckBox
+        android:layout_width="match_parent"
+        android:id="@+id/consult_rounding"
+        android:padding="20dp"
+        android:text="Round durations up to next half hour"
+        android:layout_height="wrap_content" />
+</LinearLayout>
