@@ -1,6 +1,5 @@
 package com.tokko.cameandwentv3.summary
 
-import android.animation.ValueAnimator
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
@@ -9,11 +8,11 @@ import com.tokko.cameandwentv3.R
 import com.tokko.cameandwentv3.model.Duration
 import com.tokko.cameandwentv3.model.LogEntry
 import com.tokko.cameandwentv3.model.Summary
+import com.tokko.cameandwentv3.settings.SettingsActivity
 import kotlinx.android.synthetic.main.summary_activity.*
 import org.joda.time.DateTime
-import org.joda.time.DateTimeField
 import org.joda.time.MutableDateTime
-import java.util.HashMap
+import java.util.*
 
 /**
  * Created by andre on 8/07/2017.
@@ -45,7 +44,7 @@ class SummaryActivity: AppCompatActivity() {
                             .takeLastWhile { it.timestamp > startOfLastMonth }
                             .groupBy { DateTime(it.timestamp).withDayOfWeek(1).withTimeAtStartOfDay().millis }
                             .flatMap {x -> x.value.groupBy { y -> y.projectTitle }.map { z -> Summary(x.key, z.key, z.value.groupBy { DateTime(it.timestamp).withTimeAtStartOfDay().millis }
-                                    .map { Duration(it.value) }.toList()) } }
+                                    .map { Duration(it.value, SettingsActivity.getConsultRounding(this@SummaryActivity)) }.toList()) } }
                     vpPager.adapter = SummaryFragmentAdapter(supportFragmentManager, summaries)
                 }
             }
