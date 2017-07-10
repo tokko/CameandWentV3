@@ -22,7 +22,8 @@ import java.util.*
  * Created by andre on 9/07/2017.
  */
 class CountdownNotificationService: Service(){
-    var tickReceiver: TimeTickReceiver? = null
+    var tickReceiver = TimeTickReceiver()
+    var screenReceiver = ScreenReceiver()
     var entriesToday: List<LogEntry>? = null
 
     override fun onBind(p0: Intent?): IBinder {
@@ -50,22 +51,28 @@ class CountdownNotificationService: Service(){
                             val today = DateTime(System.currentTimeMillis()).withTimeAtStartOfDay().millis
                             entriesToday = cleaned.takeLastWhile { it.timestamp > today }
                             updateNotification(nm)
-                            if (tickReceiver == null) {
-                                tickReceiver = TimeTickReceiver()
-                                registerReceiver(tickReceiver, IntentFilter(Intent.ACTION_TIME_TICK))
+                            registerReceiver(tickReceiver, IntentFilter(Intent.ACTION_TIME_TICK))
+                            val intentFilter = IntentFilter(Intent.ACTION_SCREEN_OFF)
+                            intentFilter.addAction(Intent.ACTION_SCREEN_ON)
+                            registerReceiver(screenReceiver, intentFilter)
                             }
-                        } else {
-                            if (tickReceiver != null) {
-                                unregisterReceiver(tickReceiver)
-                                tickReceiver = null
-                            }
-                            nm.cancel(0)
                         }
+                    else {
+                        unregisterReceiver(tickReceiver)
+                        unregisterReceiver(screenReceiver)
+                        nm.cancel(0)
                     }
                 }
             })
         }
         else if(intent?.action == ACTION_UPDATE){
+            updateNotification(nm)
+        }
+        else if(intent?.action == Intent.ACTION_SCREEN_OFF){
+            unregisterReceiver(tickReceiver)
+        }
+        else if(intent?.action == Intent.ACTION_SCREEN_ON){
+            registerReceiver(tickReceiver, IntentFilter(Intent.ACTION_TIME_TICK))
             updateNotification(nm)
         }
         return Service.START_STICKY

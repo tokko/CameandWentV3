@@ -9,6 +9,6 @@ import android.content.Intent
  */
 class ScreenReceiver: BroadcastReceiver() {
     override fun onReceive(p0: Context?, p1: Intent?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        p0?.startService(Intent(p0, CountdownNotificationService::class.java).setAction(p1?.action))
     }
 }
