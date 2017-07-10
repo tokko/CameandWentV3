@@ -4,10 +4,11 @@ import android.app.Fragment
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import com.tokko.cameandwentv3.log.LogListFragment
 import android.view.Menu
 import android.view.MenuItem
+import com.tokko.cameandwentv3.log.LogListFragment
 import com.tokko.cameandwentv3.projects.ProjectActivity
+import com.tokko.cameandwentv3.settings.SettingsActivity
 import com.tokko.cameandwentv3.summary.SummaryActivity
 
 /**
@@ -35,6 +36,10 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.view_summary -> {
                 startActivity(Intent(this, SummaryActivity::class.java))
+                return true
+            }
+            R.id.settings -> {
+                startActivity(Intent(this, SettingsActivity::class.java))
                 return true
             }
         }

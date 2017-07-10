@@ -9,4 +9,8 @@
         android:title="Summary"
         app:showAsAction="ifRoom"
         android:id="@+id/view_summary"/>
+    <item
+        android:title="Settings"
+        app:showAsAction="never"
+        android:id="@+id/settings"/>
 </menu>

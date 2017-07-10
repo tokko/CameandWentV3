@@ -43,6 +43,7 @@
 
         <activity android:name=".util.PermissionActivity"/>
         <activity android:name=".summary.SummaryActivity" />
+        <activity android:name=".settings.SettingsActivity" />
     </application>
 
 </manifest>
