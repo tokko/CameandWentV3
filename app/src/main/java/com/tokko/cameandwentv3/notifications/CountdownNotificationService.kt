@@ -24,8 +24,8 @@ import java.util.*
  * Created by andre on 9/07/2017.
  */
 class CountdownNotificationService: Service(){
-    var tickReceiver = TimeTickReceiver()
-    var screenReceiver = ScreenReceiver()
+    var tickReceiver: TimeTickReceiver? = null
+    var screenReceiver: ScreenReceiver? = null
     var entriesToday: List<LogEntry>? = null
 
     override fun onBind(p0: Intent?): IBinder {
@@ -35,6 +35,7 @@ class CountdownNotificationService: Service(){
     companion object {
         val ACTION_START = "com.tokko.cameandwentv3.countdownnotificationservices.ACTION_START"
         val ACTION_UPDATE = "com.tokko.cameandwentv3.countdownnotificationservices.ACTION_UPDATE"
+        val ACTION_PUNCH_OUT = "com.tokko.cameandwentv3.countdownnotificationservices.ACTION_PUNCH_OUT"
         fun initialize(context: Context){
             context.applicationContext.startService(Intent(context.applicationContext, CountdownNotificationService::class.java).setAction(ACTION_START))
         }
@@ -53,15 +54,18 @@ class CountdownNotificationService: Service(){
                             val today = DateTime(System.currentTimeMillis()).withTimeAtStartOfDay().millis
                             entriesToday = cleaned.takeLastWhile { it.timestamp > today }
                             updateNotification(nm)
-                            registerReceiver(tickReceiver, IntentFilter(Intent.ACTION_TIME_TICK))
-                            val intentFilter = IntentFilter(Intent.ACTION_SCREEN_OFF)
-                            intentFilter.addAction(Intent.ACTION_SCREEN_ON)
-                            registerReceiver(screenReceiver, intentFilter)
-                            }
+                            registerScreenReceiver()
+                            registerTickReceiver()
                         }
+                        else{
+                            unRegisterTickReceiver()
+                            unregisterScreenReceiver()
+                            nm.cancel(0)
+                        }
+                    }
                     else {
-                        unregisterReceiver(tickReceiver)
-                        unregisterReceiver(screenReceiver)
+                        unRegisterTickReceiver()
+                        unregisterScreenReceiver()
                         nm.cancel(0)
                     }
                 }
@@ -71,15 +75,43 @@ class CountdownNotificationService: Service(){
             updateNotification(nm)
         }
         else if(intent?.action == Intent.ACTION_SCREEN_OFF){
-            unregisterReceiver(tickReceiver)
+            unRegisterTickReceiver()
         }
         else if(intent?.action == Intent.ACTION_SCREEN_ON){
-            registerReceiver(tickReceiver, IntentFilter(Intent.ACTION_TIME_TICK))
+            registerTickReceiver()
             updateNotification(nm)
+        }
+        else if(intent?.action == ACTION_PUNCH_OUT){
+            val entry = LogEntry(System.currentTimeMillis(), false, entriesToday?.last()?.projectId, entriesToday?.last()?.projectTitle)
+            FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentries").child(entry.id).setValue(entry)
         }
         return Service.START_STICKY
     }
 
+    private fun unregisterScreenReceiver() {
+        if(screenReceiver != null)
+            unregisterReceiver(screenReceiver)
+        screenReceiver = null
+    }
+
+    private fun registerScreenReceiver(){
+        val intentFilter = IntentFilter(Intent.ACTION_SCREEN_OFF)
+        intentFilter.addAction(Intent.ACTION_SCREEN_ON)
+        if(screenReceiver == null)
+            screenReceiver = ScreenReceiver()
+        registerReceiver(screenReceiver, intentFilter)
+    }
+
+    private fun unRegisterTickReceiver(){
+        if(tickReceiver != null)
+            unregisterReceiver(tickReceiver)
+        tickReceiver = null
+    }
+    private fun registerTickReceiver(){
+        if(tickReceiver == null)
+            tickReceiver = TimeTickReceiver()
+        registerReceiver(tickReceiver, IntentFilter(Intent.ACTION_TIME_TICK))
+    }
     private fun updateNotification(nmp: NotificationManager? = null) {
         val nm = nmp ?: getSystemService(NotificationManager::class.java)
         val duration = Math.abs(entriesToday?.fold(0L, { a, x -> a + if (x.entered) x.timestamp else -x.timestamp })?.minus(System.currentTimeMillis()) ?: 0L)
@@ -91,6 +123,14 @@ class CountdownNotificationService: Service(){
         builder.setOngoing(true)
         builder.setProgress(max, duration.toInt(), false)
         builder.setContentIntent(PendingIntent.getActivity(applicationContext, 0, Intent(applicationContext, MainActivity::class.java), 0))
+
+        builder.addAction(
+                android.R.drawable.ic_dialog_alert,
+                "Punch out",
+                PendingIntent.getService(applicationContext,
+                0,
+                Intent(applicationContext, CountdownNotificationService::class.java).setAction(ACTION_PUNCH_OUT),
+                        0))
         val notification = builder.build()
         nm.notify(0, notification)
     }
