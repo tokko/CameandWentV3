@@ -7,25 +7,46 @@ import java.util.concurrent.TimeUnit
 /**
  * Created by andreas on 6/07/17.
  */
-class Duration(logs: Collection<LogEntry>, consultRounding: Boolean, automaticBreaks: Int) {
-    var duration: String
-    var logs: ArrayList<LogEntry> = ArrayList(logs)
-    var date: String = SimpleDateFormat("yyyy-MM-dd").format(Date(logs.first().timestamp))
-    val millisIn30Minutes = 30*60*1000
-
-    init {
+class Duration(logs: Collection<LogEntry>, val consultRounding: Boolean, val clean: Boolean = false) {
+    var duration: String = ""
+    get() {
         var duration = this.logs.fold(0L) { a, x -> a + if(x.entered) x.timestamp else -x.timestamp }
         if(logs.size%2 != 0) duration -= System.currentTimeMillis()
         duration = Math.abs(duration)
         if(consultRounding)
             duration = (((duration+millisIn30Minutes)/millisIn30Minutes)*millisIn30Minutes)
-        val reduction = 1000 * 60 * automaticBreaks
-        if(reduction >= duration)
-            duration -= reduction
-        this.duration = duration.toHourMinuteSeconds()
+        return duration.toHourMinuteSeconds()
     }
+    var logs: ArrayList<LogEntry> = ArrayList(logs.sortedBy { it.timestamp })
+    var date: String = ""
+        get() = SimpleDateFormat("yyyy-MM-dd").format(Date(logs.first().timestamp))
+    val millisIn30Minutes = 30*60*1000
 
+    init{
+        if(clean)
+            clean()
+    }
+    fun clean() : Iterable<LogEntry> {
+        val stack = Stack<LogEntry>()
+        val toRemove = ArrayList<LogEntry>()
+        toRemove.addAll(logs.sortedBy { it.timestamp }.takeWhile { !it.entered })
+        stack.addAll(logs.sortedBy { x -> x.timestamp }.asIterable())
 
+        while (!stack.empty()) {
+            val top = stack.pop()
+            if (stack.empty()) break
+            if (top.entered == stack.peek().entered)
+                toRemove.add(top)
+        }
+        val cleanedList = ArrayList(logs)
+        cleanedList.removeAll(toRemove)
+        if (cleanedList.size == 1 && !cleanedList[0].entered) {
+            toRemove.add(cleanedList[0])
+            cleanedList.clear()
+        }
+        logs = ArrayList(cleanedList)
+        return toRemove
+    }
 }
 
 fun Long.toHourMinuteSeconds(): String {

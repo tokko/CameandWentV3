@@ -13,6 +13,7 @@ import com.tokko.cameandwentv3.model.Duration
 import com.tokko.cameandwentv3.model.LogEntry
 import com.tokko.cameandwentv3.model.Project
 import com.tokko.cameandwentv3.settings.SettingsActivity
+import com.tokko.cameandwentv3.settings.getConsultRounding
 import kotlinx.android.synthetic.main.log_list_fragment.*
 import org.joda.time.DateTime
 import java.util.*
@@ -40,7 +41,13 @@ class LogListFragment: Fragment() {
                 var logEntries = p0?.getValue(object: GenericTypeIndicator<HashMap<@kotlin.jvm.JvmSuppressWildcards String, @kotlin.jvm.JvmSuppressWildcards LogEntry>>(){ })?.values?.toList()
                 if(logEntries != null){
                     //cleaning data
-                    val (_, toRemove) = LogCleaner().clean(logEntries.toList())
+
+                    //constructing durations
+                    val durations = logEntries.groupBy { DateTime(it.timestamp).withTimeAtStartOfDay().millis }
+                            .map { Duration(it.value, activity.getConsultRounding()) }.sortedBy {it.date }
+
+                    val entered = durations.toList().last().logs.toList().sortedBy { x -> x.timestamp }.last().entered
+                    val toRemove = durations.flatMap { it.clean() }
                     if(toRemove.isNotEmpty()){
                         dbRef.removeEventListener(listener)
 
@@ -49,15 +56,11 @@ class LogListFragment: Fragment() {
                         dbRef.addValueEventListener(listener)
                         return
                     }
-                    logEntries = logEntries.toList().sortedBy { it.timestamp }
-
-                    //constructing durations
-                    val durations = logEntries.groupBy { DateTime(it.timestamp).withTimeAtStartOfDay().millis }
-                            .map { Duration(it.value, SettingsActivity.getConsultRounding(activity), SettingsActivity.getAutomaticBreakDuration(activity)) }.sortedBy {it.date }
+                    durations.filter { it.logs.isNotEmpty() }
                     adapter!!.clear()
                     adapter!!.addAll(durations)
                     adapter!!.notifyDataSetChanged()
-                    val entered = durations.toList().last().logs.toList().sortedBy { x -> x.timestamp }.last().entered
+
                     clock_button!!.isChecked = entered
                     loglist.expandGroup(adapter?.groupCount!!.minus(1))
                 }

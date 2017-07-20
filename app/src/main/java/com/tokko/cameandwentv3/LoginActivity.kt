@@ -21,9 +21,11 @@ import com.tokko.cameandwentv3.model.LogEntry
 import com.tokko.cameandwentv3.model.Setting
 import com.tokko.cameandwentv3.notifications.CountdownNotificationService
 import com.tokko.cameandwentv3.settings.SettingsActivity
+import com.tokko.cameandwentv3.settings.setAutomaticBreakDuration
+import com.tokko.cameandwentv3.settings.setAutomaticBreakStart
+import com.tokko.cameandwentv3.settings.setConsultRounding
 import com.tokko.cameandwentv3.wifi.WifiReceiver
 import java.util.*
-
 
 /**
  * A login screen that offers login via email/password.
@@ -58,7 +60,6 @@ class LoginActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedList
 
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
         super.onActivityResult(requestCode, resultCode, data)
-
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == 0) {
             val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
@@ -81,14 +82,10 @@ class LoginActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedList
                                 Toast.makeText(this@LoginActivity, "Authentication failed.",
                                         Toast.LENGTH_SHORT).show()
                             }
-
-                            // ...
                         }
 
             } else {
                 Toast.makeText(this, "Login failed", Toast.LENGTH_SHORT).show()
-                // Google Sign In failed, update UI appropriately
-                // ...
             }
         }
     }
@@ -124,8 +121,9 @@ class LoginActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedList
             override fun onDataChange(p0: DataSnapshot?) {
                 val setting = p0?.getValue(Setting::class.java)
                 if(setting != null){
-                    SettingsActivity.setAutomaticBreakDuration(applicationContext, setting.automaticBreak)
-                    SettingsActivity.setConsultRounding(applicationContext,  setting.consultRounding)
+                    setAutomaticBreakDuration(setting.automaticBreak)
+                    setAutomaticBreakStart(setting.automaticBreakStart)
+                    setConsultRounding( setting.consultRounding)
                 }
             }
         })

@@ -13,10 +13,10 @@ import android.support.v4.app.NotificationCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.tokko.cameandwentv3.MainActivity
-import com.tokko.cameandwentv3.log.LogCleaner
 import com.tokko.cameandwentv3.model.LogEntry
 import com.tokko.cameandwentv3.model.toHourMinute
 import com.tokko.cameandwentv3.settings.SettingsActivity
+import com.tokko.cameandwentv3.settings.getAutomaticBreakDuration
 import org.joda.time.DateTime
 import java.util.*
 
@@ -50,10 +50,9 @@ class CountdownNotificationService: Service(){
                 override fun onDataChange(p0: DataSnapshot?) {
                     val logEntries = p0?.getValue(object : GenericTypeIndicator<HashMap<@kotlin.jvm.JvmSuppressWildcards String, @kotlin.jvm.JvmSuppressWildcards LogEntry>>() {})?.values?.sortedBy { it.timestamp }?.toList()
                     if (logEntries != null) {
-                        val (cleaned, _) = LogCleaner().clean(logEntries.toList())
-                        if (cleaned.last().entered) {
+                        if (logEntries.last().entered) {
                             val today = DateTime(System.currentTimeMillis()).withTimeAtStartOfDay().millis
-                            entriesToday = cleaned.takeLastWhile { it.timestamp > today }
+                            entriesToday = logEntries.takeLastWhile { it.timestamp > today }
                             updateNotification(nm)
                             registerScreenReceiver()
                             registerTickReceiver()
@@ -116,13 +115,13 @@ class CountdownNotificationService: Service(){
     private fun updateNotification(nmp: NotificationManager? = null) {
         val nm = nmp ?: getSystemService(NotificationManager::class.java)
         val duration = Math.abs(entriesToday?.fold(0L, { a, x -> a + if (x.entered) x.timestamp else -x.timestamp })?.minus(System.currentTimeMillis()) ?: 0L)
-        val max = 8 * 60 * 60 * 1000 + SettingsActivity.getAutomaticBreakDuration(applicationContext)*60*1000
+        val max = 8 * 60 * 60 * 1000 + getAutomaticBreakDuration()*60*1000
         val builder = NotificationCompat.Builder(applicationContext, Notification.CATEGORY_MESSAGE)
         builder.mContentTitle = ""
         builder.mContentText = "Time remaining: " + (max - duration).toHourMinute()
         builder.setSmallIcon(R.drawable.ic_dialog_alert)
         builder.setOngoing(true)
-        builder.setProgress(max, duration.toInt(), false)
+        builder.setProgress(max.toInt(), duration.toInt(), false)
         builder.setContentIntent(PendingIntent.getActivity(applicationContext, 0, Intent(applicationContext, MainActivity::class.java), 0))
 
         builder.addAction(
