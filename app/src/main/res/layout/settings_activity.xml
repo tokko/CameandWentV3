@@ -5,13 +5,21 @@
 
     <TextView
         android:layout_width="wrap_content"
+        android:text="Automatic lunch break start:"
+        android:layout_height="wrap_content" />
+    <Button
+        android:layout_width="match_parent"
+        android:id="@+id/lunch_break_time"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:layout_width="wrap_content"
         android:text="Automatic lunch break duration"
         android:layout_height="wrap_content" />
-    <EditText
+    <Button
+        android:id="@+id/lunch_break_duration"
         android:layout_width="match_parent"
-        android:id="@+id/automaticbreak"
-        android:hint="Break duration"
-        android:text="30"
+        android:text="Automatic lunch break duration"
         android:layout_height="wrap_content" />
 
     <CheckBox

@@ -14,6 +14,9 @@ import org.joda.time.DateTime
 class TimePickerDialogFragment : DialogFragment() {
     companion object {
         val RESULT_TIME = "time"
+        fun fromIntent(intent: Intent?): Long{
+            return intent!!.getLongExtra(RESULT_TIME, 0)
+        }
     }
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val currentTime = DateTime(System.currentTimeMillis())
