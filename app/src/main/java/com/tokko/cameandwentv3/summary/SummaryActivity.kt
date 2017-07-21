@@ -9,7 +9,7 @@ import com.tokko.cameandwentv3.model.Duration
 import com.tokko.cameandwentv3.model.LogEntry
 import com.tokko.cameandwentv3.model.Summary
 import com.tokko.cameandwentv3.settings.SettingsActivity
-import com.tokko.cameandwentv3.settings.getConsultRounding
+import com.tokko.cameandwentv3.settings.getSetting
 import kotlinx.android.synthetic.main.summary_activity.*
 import org.joda.time.DateTime
 import org.joda.time.MutableDateTime
@@ -45,7 +45,7 @@ class SummaryActivity: AppCompatActivity() {
                             .takeLastWhile { it.timestamp > startOfLastMonth }
                             .groupBy { DateTime(it.timestamp).withDayOfWeek(1).withTimeAtStartOfDay().millis }
                             .flatMap {x -> x.value.groupBy { y -> y.projectTitle }.map { z -> Summary(x.key, z.key, z.value.groupBy { DateTime(it.timestamp).withTimeAtStartOfDay().millis }
-                                    .map { Duration(it.value, getConsultRounding(), true) }
+                                    .map { Duration(it.value, getSetting().consultRounding, true) }
                                     .toList()) } }
                     vpPager.adapter = SummaryFragmentAdapter(supportFragmentManager, summaries)
                 }

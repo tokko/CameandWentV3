@@ -12,8 +12,7 @@ import com.tokko.cameandwentv3.R
 import com.tokko.cameandwentv3.model.Duration
 import com.tokko.cameandwentv3.model.LogEntry
 import com.tokko.cameandwentv3.model.Project
-import com.tokko.cameandwentv3.settings.SettingsActivity
-import com.tokko.cameandwentv3.settings.getConsultRounding
+import com.tokko.cameandwentv3.settings.getSetting
 import kotlinx.android.synthetic.main.log_list_fragment.*
 import org.joda.time.DateTime
 import java.util.*
@@ -44,7 +43,7 @@ class LogListFragment: Fragment() {
 
                     //constructing durations
                     val durations = logEntries.groupBy { DateTime(it.timestamp).withTimeAtStartOfDay().millis }
-                            .map { Duration(it.value, activity.getConsultRounding()) }.sortedBy {it.date }
+                            .map { Duration(it.value, activity.getSetting().consultRounding) }.sortedBy {it.date }
 
                     val entered = durations.toList().last().logs.toList().sortedBy { x -> x.timestamp }.last().entered
                     val toRemove = durations.flatMap { it.clean() }

@@ -3,31 +3,26 @@ package com.tokko.cameandwentv3.settings
 import android.app.Activity
 import android.content.Context
 import android.os.Bundle
+import com.google.gson.Gson
+import com.tokko.cameandwentv3.model.Setting
 
 /**
  * Created by andreas on 10/07/17.
  */
-fun Context.getAutomaticBreakDuration(): Long{
-    return this.getSharedPreferences("settings", Context.MODE_PRIVATE).getLong("automaticbreaks", 30)
+fun Context.getSetting(): Setting {
+    val string = this.getSharedPreferences("settings", Context.MODE_PRIVATE).getString("settings", "")
+    if(string.isEmpty()){
+        var setting = Setting()
+        setting.consultRounding = true
+        setting.automaticBreak = 30*60*1000
+        setting.automaticBreakStart = 11*60*60*1000 + 30*60*1000
+        return setting
+    }
+    return Gson().fromJson(string, Setting::class.java)
 }
 
-fun Context.setAutomaticBreakDuration(duration: Long){
-    this.getSharedPreferences("settings", Context.MODE_PRIVATE).edit().putLong("automaticbreaks", duration).apply()
-}
-fun Context.getAutomaticBreakStart(): Long{
-    return this.getSharedPreferences("settings", Context.MODE_PRIVATE).getLong("automaticstart", 0)
-}
-
-fun Context.setAutomaticBreakStart(duration: Long){
-    this.getSharedPreferences("settings", Context.MODE_PRIVATE).edit().putLong("automaticstart", duration).apply()
-}
-
-fun Context.getConsultRounding(): Boolean{
-    return this.getSharedPreferences("settings", Context.MODE_PRIVATE).getBoolean("consultrounding", true)
-}
-
-fun Context.setConsultRounding(rounding: Boolean) {
-    this.getSharedPreferences("settings", Context.MODE_PRIVATE).edit().putBoolean("consultrounding", rounding).apply()
+fun Context.setSetting(setting: Setting){
+    this.getSharedPreferences("settings", Context.MODE_PRIVATE).edit().putString("settings", Gson().toJson(setting)).apply()
 }
 class SettingsActivity: Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {

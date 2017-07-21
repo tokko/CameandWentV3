@@ -16,6 +16,11 @@ import java.util.HashMap
 /**
  * Created by andre on 29/06/2017.
  */
+
+fun Context.getBus(): Bus{
+    return (this.applicationContext as MyApplication).bus
+}
+
 class MyApplication : Application() {
     var bus : Bus = Bus()
 
@@ -23,8 +28,6 @@ class MyApplication : Application() {
         super.onCreate()
 
     }
-
-
 
     private fun mockData() {
         val dbRef = FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentries")

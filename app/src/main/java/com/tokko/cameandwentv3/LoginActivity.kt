@@ -13,17 +13,16 @@ import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
+import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.database.*
+import com.tokko.cameandwentv3.automaticbreaks.AutomaticBreakService
 import com.tokko.cameandwentv3.geofence.GeofenceService
 import com.tokko.cameandwentv3.model.LogEntry
 import com.tokko.cameandwentv3.model.Setting
 import com.tokko.cameandwentv3.notifications.CountdownNotificationService
-import com.tokko.cameandwentv3.settings.SettingsActivity
-import com.tokko.cameandwentv3.settings.setAutomaticBreakDuration
-import com.tokko.cameandwentv3.settings.setAutomaticBreakStart
-import com.tokko.cameandwentv3.settings.setConsultRounding
+import com.tokko.cameandwentv3.settings.setSetting
 import com.tokko.cameandwentv3.wifi.WifiReceiver
 import java.util.*
 
@@ -39,6 +38,7 @@ class LoginActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedList
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FirebaseApp.initializeApp(applicationContext)
         var client = "552248423889-pjailnadigjg55n0ft2qc5scbq6pa1pf.apps.googleusercontent.com"
 
         var gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -113,6 +113,7 @@ class LoginActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedList
         setupSoundToggling()
         CountdownNotificationService.initialize(applicationContext)
         setupSettingSync()
+        AutomaticBreakService.initialize(applicationContext)
     }
 
     private fun setupSettingSync() {
@@ -121,9 +122,7 @@ class LoginActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedList
             override fun onDataChange(p0: DataSnapshot?) {
                 val setting = p0?.getValue(Setting::class.java)
                 if(setting != null){
-                    setAutomaticBreakDuration(setting.automaticBreak)
-                    setAutomaticBreakStart(setting.automaticBreakStart)
-                    setConsultRounding( setting.consultRounding)
+                    setSetting(setting)
                 }
             }
         })

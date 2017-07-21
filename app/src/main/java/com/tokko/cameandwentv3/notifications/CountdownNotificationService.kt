@@ -15,8 +15,7 @@ import com.google.firebase.database.*
 import com.tokko.cameandwentv3.MainActivity
 import com.tokko.cameandwentv3.model.LogEntry
 import com.tokko.cameandwentv3.model.toHourMinute
-import com.tokko.cameandwentv3.settings.SettingsActivity
-import com.tokko.cameandwentv3.settings.getAutomaticBreakDuration
+import com.tokko.cameandwentv3.settings.getSetting
 import org.joda.time.DateTime
 import java.util.*
 
@@ -115,7 +114,7 @@ class CountdownNotificationService: Service(){
     private fun updateNotification(nmp: NotificationManager? = null) {
         val nm = nmp ?: getSystemService(NotificationManager::class.java)
         val duration = Math.abs(entriesToday?.fold(0L, { a, x -> a + if (x.entered) x.timestamp else -x.timestamp })?.minus(System.currentTimeMillis()) ?: 0L)
-        val max = 8 * 60 * 60 * 1000 + getAutomaticBreakDuration()*60*1000
+        val max = 8 * 60 * 60 * 1000 + getSetting().automaticBreakStart*60*1000
         val builder = NotificationCompat.Builder(applicationContext, Notification.CATEGORY_MESSAGE)
         builder.mContentTitle = ""
         builder.mContentText = "Time remaining: " + (max - duration).toHourMinute()
