@@ -44,7 +44,10 @@ class CountdownNotificationService: Service(){
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val nm = getSystemService(NotificationManager::class.java)
         if(intent?.action == ACTION_START) {
-            FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentries").addValueEventListener(object : ValueEventListener {
+            FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid)
+                    .child("logentries")
+                    .orderByChild(LogEntry::timestamp.name)
+                    .addValueEventListener(object : ValueEventListener {
                 override fun onCancelled(p0: DatabaseError?) {}
                 override fun onDataChange(p0: DataSnapshot?) {
                     val logEntries = p0?.getValue(object : GenericTypeIndicator<HashMap<@kotlin.jvm.JvmSuppressWildcards String, @kotlin.jvm.JvmSuppressWildcards LogEntry>>() {})?.values?.sortedBy { it.timestamp }?.toList()

@@ -60,7 +60,8 @@ class AutomaticBreakService : IntentService("AutomaticBreakService") {
                 schedule()
             }
             else if(intent.action!!.equals(ACTION_ON_BREAK_ALARM)){
-                FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentries").orderByChild("timestamp").limitToLast(1)
+                FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentries")
+                        .orderByChild(LogEntry::timestamp.name).limitToLast(1)
                         .addListenerForSingleValueEvent(object : ValueEventListener {
                             override fun onCancelled(p0: DatabaseError?) {}
                             override fun onDataChange(p0: DataSnapshot?) {
