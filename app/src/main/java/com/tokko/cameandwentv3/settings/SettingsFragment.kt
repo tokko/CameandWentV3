@@ -10,12 +10,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.tokko.cameandwentv3.R
 import com.tokko.cameandwentv3.automaticbreaks.AutomaticBreakService
-import com.tokko.cameandwentv3.events.EventSettingsChanged
 import com.tokko.cameandwentv3.model.Setting
 import com.tokko.cameandwentv3.model.toHourMinute
 import com.tokko.cameandwentv3.util.TimePickerDialogFragment
 import kotlinx.android.synthetic.main.settings_activity.*
-import org.greenrobot.eventbus.EventBus
 
 /**
  * Created by andreas on 10/07/17.
@@ -71,7 +69,6 @@ class SettingsFragment: Fragment() {
         setting.consultRounding = consult_rounding.isChecked
         FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("settings").setValue(setting)
         activity.setSetting(setting)
-        EventBus.getDefault().post(EventSettingsChanged(setting))
         AutomaticBreakService.initialize(activity)
     }
 }
