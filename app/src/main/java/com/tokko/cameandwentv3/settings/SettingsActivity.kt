@@ -4,7 +4,9 @@ import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import com.google.gson.Gson
+import com.tokko.cameandwentv3.events.EventSettingsChanged
 import com.tokko.cameandwentv3.model.Setting
+import org.greenrobot.eventbus.EventBus
 
 /**
  * Created by andreas on 10/07/17.
@@ -23,7 +25,9 @@ fun Context.getSetting(): Setting {
 
 fun Context.setSetting(setting: Setting){
     this.getSharedPreferences("settings", Context.MODE_PRIVATE).edit().putString("settings", Gson().toJson(setting)).apply()
+    EventBus.getDefault().post(EventSettingsChanged(setting))
 }
+
 class SettingsActivity: Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

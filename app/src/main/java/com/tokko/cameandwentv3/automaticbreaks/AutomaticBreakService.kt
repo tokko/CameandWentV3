@@ -45,7 +45,7 @@ class AutomaticBreakService : IntentService("AutomaticBreakService") {
                     var am = getSystemService(AlarmManager::class.java)
                     val entered = logEntries.sortedBy { it.timestamp }.last().entered
                     am.cancel(pendingIntent)
-                    if (entered) {
+                    if (triggerTime > System.currentTimeMillis() && entered) {
                         am.set(AlarmManager.RTC, triggerTime, pendingIntent)
                     }
                 }
