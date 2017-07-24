@@ -1,29 +1,17 @@
 package com.tokko.cameandwentv3
 
 import android.app.Application
-import android.content.Context
-import android.content.SharedPreferences
-import android.media.AudioManager
-import android.os.Build
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-import com.squareup.otto.Bus
 import com.tokko.cameandwentv3.model.LogEntry
-import com.tokko.cameandwentv3.notifications.CountdownNotificationService
 import org.joda.time.MutableDateTime
-import java.util.HashMap
+import java.util.*
 
 /**
  * Created by andre on 29/06/2017.
  */
 
-fun Context.getBus(): Bus{
-    return (this.applicationContext as MyApplication).bus
-}
-
 class MyApplication : Application() {
-    var bus : Bus = Bus()
-
     override fun onCreate() {
         super.onCreate()
 

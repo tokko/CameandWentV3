@@ -2,10 +2,10 @@ package com.tokko.cameandwentv3.projects
 
 import android.app.Activity
 import android.os.Bundle
-import com.squareup.otto.Subscribe
-import com.tokko.cameandwentv3.MyApplication
 import com.tokko.cameandwentv3.events.EventEditProject
 import com.tokko.cameandwentv3.events.EventEditProjectComplete
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
 
 class ProjectActivity : Activity() {
     var editFragment: ProjectEditFragment? = null
@@ -20,12 +20,12 @@ class ProjectActivity : Activity() {
 
     override fun onStart() {
         super.onStart()
-        (application as MyApplication).bus.register(this)
+        EventBus.getDefault().register(this)
     }
 
     override fun onStop() {
         super.onStop()
-        (application as MyApplication).bus.unregister(this)
+        EventBus.getDefault().unregister(this)
     }
 
     @Subscribe

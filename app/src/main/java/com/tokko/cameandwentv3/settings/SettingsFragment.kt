@@ -9,12 +9,13 @@ import android.view.ViewGroup
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.tokko.cameandwentv3.R
+import com.tokko.cameandwentv3.automaticbreaks.AutomaticBreakService
 import com.tokko.cameandwentv3.events.EventSettingsChanged
-import com.tokko.cameandwentv3.getBus
 import com.tokko.cameandwentv3.model.Setting
 import com.tokko.cameandwentv3.model.toHourMinute
 import com.tokko.cameandwentv3.util.TimePickerDialogFragment
 import kotlinx.android.synthetic.main.settings_activity.*
+import org.greenrobot.eventbus.EventBus
 
 /**
  * Created by andreas on 10/07/17.
@@ -32,10 +33,10 @@ class SettingsFragment: Fragment() {
         consult_rounding.isChecked = setting.consultRounding
         var autoStart = setting.automaticBreakStart
         if(autoStart == 0L)
-            lunch_break_time.setText("Choose time")
+            lunch_break_time.text = "Choose time"
         else
-            lunch_break_time.setText(autoStart.toHourMinute())
-        lunch_break_duration.setText(setting.automaticBreak.toHourMinute())
+            lunch_break_time.text = autoStart.toHourMinute()
+        lunch_break_duration.text = setting.automaticBreakDuration.toHourMinute()
         lunch_break_duration.setOnClickListener {
             var tpdf = TimePickerDialogFragment()
             tpdf.setTargetFragment(this, 0)
@@ -53,21 +54,16 @@ class SettingsFragment: Fragment() {
         when(requestCode){
             0 -> {
                 var time = TimePickerDialogFragment.fromIntent(data)
-                lunch_break_duration.setText(time.toLong().toHourMinute())
-                setting.automaticBreak = time
+                lunch_break_duration.text = time.toLong().toHourMinute()
+                setting.automaticBreakDuration = time
             }
             1 -> {
                 var time = TimePickerDialogFragment.fromIntent(data)
-                lunch_break_time.setText(time.toLong().toHourMinute())
+                lunch_break_time.text = time.toLong().toHourMinute()
                 setting.automaticBreakStart = time
             }
         }
         super.onActivityResult(requestCode, resultCode, data)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        activity.getBus().register(this)
     }
 
     override fun onPause() {
@@ -75,7 +71,7 @@ class SettingsFragment: Fragment() {
         setting.consultRounding = consult_rounding.isChecked
         FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("settings").setValue(setting)
         activity.setSetting(setting)
-        activity.getBus().post(EventSettingsChanged(setting))
-        activity.getBus().unregister(this)
+        EventBus.getDefault().post(EventSettingsChanged(setting))
+        AutomaticBreakService.initialize(activity)
     }
 }

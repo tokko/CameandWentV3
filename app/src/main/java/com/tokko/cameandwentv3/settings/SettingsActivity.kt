@@ -14,7 +14,7 @@ fun Context.getSetting(): Setting {
     if(string.isEmpty()){
         var setting = Setting()
         setting.consultRounding = true
-        setting.automaticBreak = 30*60*1000
+        setting.automaticBreakDuration = 30 * 60 * 1000
         setting.automaticBreakStart = 11*60*60*1000 + 30*60*1000
         return setting
     }
