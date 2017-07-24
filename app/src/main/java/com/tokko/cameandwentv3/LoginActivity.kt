@@ -113,7 +113,7 @@ class LoginActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedList
         setupSoundToggling()
         CountdownNotificationService.initialize(applicationContext)
         setupSettingSync()
-        AutomaticBreakService.initialize(applicationContext)
+        AutomaticBreakService.initialize(this)
     }
 
     private fun setupSettingSync() {

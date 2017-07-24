@@ -5,18 +5,17 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.app.DialogFragment
 import android.app.Fragment
-import android.content.*
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Context.LAYOUT_INFLATER_SERVICE
 import android.content.Context.LOCATION_SERVICE
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.location.Location
-import android.location.LocationListener
 import android.location.LocationManager
-import android.net.wifi.ScanResult
 import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.os.Handler
-import android.os.Looper
 import android.os.ResultReceiver
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
@@ -31,13 +30,12 @@ import android.widget.TextView
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
-import com.tokko.cameandwentv3.MyApplication
 import com.tokko.cameandwentv3.R
 import com.tokko.cameandwentv3.events.EventEditProjectComplete
 import com.tokko.cameandwentv3.model.Project
 import kotlinx.android.synthetic.main.project_edit_fragment.*
 import kotlinx.android.synthetic.main.ssid_list_dialog_fragment.*
-import java.util.stream.Collector
+import org.greenrobot.eventbus.EventBus
 import java.util.stream.Collectors
 
 class ProjectEditFragment : Fragment(){
@@ -72,12 +70,12 @@ class ProjectEditFragment : Fragment(){
     }
     override fun onStart() {
         super.onStart()
-        (activity.application as MyApplication).bus.register(this)
+        EventBus.getDefault().register(this)
     }
 
     override fun onStop() {
         super.onStop()
-        (activity.application as MyApplication).bus.unregister(this)
+        EventBus.getDefault().unregister(this)
     }
 
     override fun onResume() {
@@ -107,8 +105,10 @@ class ProjectEditFragment : Fragment(){
             FirebaseDatabase.getInstance().getReference(FirebaseAuth.getInstance()
                     .currentUser!!.uid+"/projects/"+project!!.id)
                     .setValue(project)
-            (activity.application as MyApplication).bus.post(EventEditProjectComplete(project)) }
-            cancel.setOnClickListener { (activity.application as MyApplication).bus.post(EventEditProjectComplete(project))
+            EventBus.getDefault().post(EventEditProjectComplete(project))
+        }
+        cancel.setOnClickListener {
+            EventBus.getDefault().post(EventEditProjectComplete(project))
         }
 
         title!!.addTextChangedListener(object: TextWatcher{
