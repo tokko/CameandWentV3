@@ -68,19 +68,6 @@ class ProjectEditFragment : Fragment(){
         super.onViewCreated(view, savedInstanceState)
         bindViews()
     }
-    override fun onStart() {
-        super.onStart()
-        EventBus.getDefault().register(this)
-    }
-
-    override fun onStop() {
-        super.onStop()
-        EventBus.getDefault().unregister(this)
-    }
-
-    override fun onResume() {
-        super.onResume()
-    }
 
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
@@ -89,7 +76,7 @@ class ProjectEditFragment : Fragment(){
 
     private fun bindViews() {
         title!!.setText(project!!.title)
-        locationAdapter = object: ArrayAdapter<Project.ProjectLocation>(activity, android.R.layout.simple_list_item_1, android.R.id.text1, project!!.locations){
+        locationAdapter = object : ArrayAdapter<Project.ProjectLocation>(activity, android.R.layout.simple_list_item_1, android.R.id.text1, project!!.locations.toList()) {
             override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
                 val v = convertView ?: (activity.getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater).inflate(android.R.layout.simple_list_item_1, null)
                 val item = getItem(position)
