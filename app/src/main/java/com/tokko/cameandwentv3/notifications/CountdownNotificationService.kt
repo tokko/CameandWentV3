@@ -48,30 +48,28 @@ class CountdownNotificationService: Service(){
                     .child("logentries")
                     .orderByChild(LogEntry::timestamp.name)
                     .addValueEventListener(object : ValueEventListener {
-                override fun onCancelled(p0: DatabaseError?) {}
-                override fun onDataChange(p0: DataSnapshot?) {
-                    val logEntries = p0?.getValue(object : GenericTypeIndicator<HashMap<@kotlin.jvm.JvmSuppressWildcards String, @kotlin.jvm.JvmSuppressWildcards LogEntry>>() {})?.values?.sortedBy { it.timestamp }?.toList()
-                    if (logEntries != null) {
-                        if (logEntries.last().entered) {
-                            val today = DateTime(System.currentTimeMillis()).withTimeAtStartOfDay().millis
-                            entriesToday = logEntries.takeLastWhile { it.timestamp > today }
-                            updateNotification(nm)
-                            registerScreenReceiver()
-                            registerTickReceiver()
+                        override fun onCancelled(p0: DatabaseError?) {}
+                        override fun onDataChange(p0: DataSnapshot?) {
+                            val logEntries = p0?.getValue(object : GenericTypeIndicator<HashMap<@kotlin.jvm.JvmSuppressWildcards String, @kotlin.jvm.JvmSuppressWildcards LogEntry>>() {})?.values?.sortedBy { it.timestamp }?.toList()
+                            if (logEntries != null) {
+                                if (logEntries.last().entered) {
+                                    val today = DateTime(System.currentTimeMillis()).withTimeAtStartOfDay().millis
+                                    entriesToday = logEntries.takeLastWhile { it.timestamp > today }
+                                    updateNotification(nm)
+                                    registerScreenReceiver()
+                                    registerTickReceiver()
+                                } else {
+                                    unRegisterTickReceiver()
+                                    unregisterScreenReceiver()
+                                    nm.cancel(0)
+                                }
+                            } else {
+                                unRegisterTickReceiver()
+                                unregisterScreenReceiver()
+                                nm.cancel(0)
+                            }
                         }
-                        else{
-                            unRegisterTickReceiver()
-                            unregisterScreenReceiver()
-                            nm.cancel(0)
-                        }
-                    }
-                    else {
-                        unRegisterTickReceiver()
-                        unregisterScreenReceiver()
-                        nm.cancel(0)
-                    }
-                }
-            })
+                    })
         }
         else if(intent?.action == ACTION_UPDATE){
             updateNotification(nm)
@@ -116,8 +114,10 @@ class CountdownNotificationService: Service(){
     }
     private fun updateNotification(nmp: NotificationManager? = null) {
         val nm = nmp ?: getSystemService(NotificationManager::class.java)
-        val duration = Math.abs(entriesToday?.fold(0L, { a, x -> a + if (x.entered) x.timestamp else -x.timestamp })?.minus(System.currentTimeMillis()) ?: 0L)
-        val max = 8 * 60 * 60 * 1000 + getSetting().automaticBreakStart*60*1000
+        var duration = Math.abs(entriesToday!!.fold(-Math.max(System.currentTimeMillis(), entriesToday!!.last().timestamp), { a, x -> a + if (x.entered) x.timestamp else -x.timestamp }))
+        //  if(entriesToday!!.last().timestamp < System.currentTimeMillis())
+        //      duration = duration?.minus(System.currentTimeMillis()) ?: 0L
+        val max = 8 * 60 * 60 * 1000 + getSetting().automaticBreakDuration
         val builder = NotificationCompat.Builder(applicationContext, Notification.CATEGORY_MESSAGE)
         builder.mContentTitle = ""
         builder.mContentText = "Time remaining: " + (max - duration).toHourMinute()
@@ -130,8 +130,8 @@ class CountdownNotificationService: Service(){
                 android.R.drawable.ic_dialog_alert,
                 "Punch out",
                 PendingIntent.getService(applicationContext,
-                0,
-                Intent(applicationContext, CountdownNotificationService::class.java).setAction(ACTION_PUNCH_OUT),
+                        0,
+                        Intent(applicationContext, CountdownNotificationService::class.java).setAction(ACTION_PUNCH_OUT),
                         0))
         val notification = builder.build()
         nm.notify(0, notification)

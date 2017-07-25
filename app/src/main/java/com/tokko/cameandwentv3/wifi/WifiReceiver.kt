@@ -1,13 +1,9 @@
 package com.tokko.cameandwentv3.wifi
 
-import android.R
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.widget.Toast
-import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
-import android.widget.ArrayAdapter
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.tokko.cameandwentv3.model.LogEntry
@@ -20,6 +16,7 @@ import com.tokko.cameandwentv3.model.Project
 class WifiReceiver : BroadcastReceiver() {
     val noWifiSSID = "<unknown ssid>"
     override fun onReceive(context: Context?, intent: Intent?) {
+        return //TODO: remove this line
         val wifiManager = context?.getSystemService(Context.WIFI_SERVICE) as WifiManager
         val info = wifiManager.connectionInfo
         val ssid = info.ssid.replace("\"", "")
