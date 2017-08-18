@@ -20,6 +20,7 @@ android {
             storePassword props.getProperty("storePassword")
             storeFile file('../keystore')
         }
+
         lintOptions {
             abortOnError false
         }
