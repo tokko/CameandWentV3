@@ -84,7 +84,7 @@ class LogEditFragment: Fragment() {
             timePickerDialog.setTargetFragment(this, 1)
             timePickerDialog.show(fragmentManager, "timepickerfragment")
         }
-        end_time_button.setOnCheckedChangeListener { compoundButton, isChecked ->
+        end_time_button.setOnCheckedChangeListener { _, isChecked ->
             if(isChecked){
                 val timePickerDialog = TimePickerDialogFragment()
                 timePickerDialog.setTargetFragment(this, 2)
