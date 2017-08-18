@@ -20,6 +20,9 @@ android {
             storePassword props.getProperty("storePassword")
             storeFile file('../keystore')
         }
+        lintOptions {
+            abortOnError false
+        }
     }
     compileSdkVersion 26
     buildToolsVersion "25.0.3"
