@@ -12,10 +12,14 @@ import android.content.Context.LOCATION_SERVICE
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.location.Criteria
+import android.location.Location
+import android.location.LocationListener
 import android.location.LocationManager
 import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.os.ResultReceiver
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
@@ -76,7 +80,7 @@ class ProjectEditFragment : Fragment(){
 
     private fun bindViews() {
         title!!.setText(project!!.title)
-        locationAdapter = object : ArrayAdapter<Project.ProjectLocation>(activity, android.R.layout.simple_list_item_1, android.R.id.text1, project!!.locations.toList()) {
+        locationAdapter = object : ArrayAdapter<Project.ProjectLocation>(activity, android.R.layout.simple_list_item_1, android.R.id.text1, project!!.locations) {
             override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
                 val v = convertView ?: (activity.getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater).inflate(android.R.layout.simple_list_item_1, null)
                 val item = getItem(position)
@@ -165,20 +169,34 @@ class ProjectEditFragment : Fragment(){
             }
             return
         }
-        val location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-        if(location != null) {
-            project!!.addLocation(location)
-            locationAdapter!!.notifyDataSetChanged()
-            val resultReceiver: ResultReceiver = object : ResultReceiver(Handler()) {
-                override fun onReceiveResult(resultCode: Int, resultData: Bundle?) {
-                    project!!.locations.last().address = resultData!!.getString("address")
-                    locationAdapter!!.notifyDataSetChanged()
-                }
+        val criteria = Criteria()
+        criteria.accuracy = Criteria.ACCURACY_FINE
+        criteria.powerRequirement = Criteria.POWER_HIGH
+        mLocationManager.requestSingleUpdate(criteria, object : LocationListener{
+            override fun onStatusChanged(p0: String?, p1: Int, p2: Bundle?) {
             }
 
-            GeocodingService.startService(activity, project!!.id, location.latitude, location.longitude, resultReceiver)
-        }
+            override fun onProviderEnabled(p0: String?) {
+            }
 
+            override fun onProviderDisabled(p0: String?) {
+            }
+
+            override fun onLocationChanged(location: Location?) {
+                if(location != null) {
+                    project!!.addLocation(location)
+                    locationAdapter!!.notifyDataSetChanged()
+                    val resultReceiver: ResultReceiver = object : ResultReceiver(Handler()) {
+                        override fun onReceiveResult(resultCode: Int, resultData: Bundle?) {
+                            project!!.locations.last().address = resultData!!.getString("address")
+                            locationAdapter!!.notifyDataSetChanged()
+                        }
+                    }
+
+                    GeocodingService.startService(activity, project!!.id, location.latitude, location.longitude, resultReceiver)
+                }
+            }
+        }, Looper.getMainLooper())
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>?, grantResults: IntArray?) {
