@@ -16,7 +16,6 @@ import com.tokko.cameandwentv3.model.Project
 class WifiReceiver : BroadcastReceiver() {
     val noWifiSSID = "<unknown ssid>"
     override fun onReceive(context: Context?, intent: Intent?) {
-        return //TODO: remove this line
         val wifiManager = context?.getSystemService(Context.WIFI_SERVICE) as WifiManager
         val info = wifiManager.connectionInfo
         val ssid = info.ssid.replace("\"", "")

@@ -30,19 +30,19 @@ class AutomaticBreakService : IntentService("AutomaticBreakService") {
     @Subscribe
     fun schedule(event: EventSettingsChanged? = null){
 
-        var setting = event?.setting ?: getSetting()
+        val setting = event?.setting ?: getSetting()
         FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentries").addValueEventListener(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError?) {}
             override fun onDataChange(p0: DataSnapshot?) {
-                var logEntries = p0?.getValue(object : GenericTypeIndicator<HashMap<@kotlin.jvm.JvmSuppressWildcards String, @kotlin.jvm.JvmSuppressWildcards LogEntry>>() {})?.values?.toList()
+                val logEntries = p0?.getValue(object : GenericTypeIndicator<HashMap<@kotlin.jvm.JvmSuppressWildcards String, @kotlin.jvm.JvmSuppressWildcards LogEntry>>() {})?.values?.toList()
                 if (logEntries != null) {
-                    var pendingIntent = PendingIntent.getService(applicationContext, 0,
+                    val pendingIntent = PendingIntent.getService(applicationContext, 0,
                             Intent(applicationContext, AutomaticBreakService::class.java).setAction(ACTION_ON_BREAK_ALARM),
                             0)
-                    var today = MutableDateTime()
+                    val today = MutableDateTime()
                     today.millisOfDay = setting.automaticBreakStart.toInt()
-                    var triggerTime = today.millis
-                    var am = getSystemService(AlarmManager::class.java)
+                    val triggerTime = today.millis
+                    val am = getSystemService(AlarmManager::class.java)
                     val entered = logEntries.sortedBy { it.timestamp }.last().entered
                     am.cancel(pendingIntent)
                     if (triggerTime > System.currentTimeMillis() && entered) {
@@ -55,28 +55,27 @@ class AutomaticBreakService : IntentService("AutomaticBreakService") {
 
     override fun onHandleIntent(intent: Intent?) {
         if(intent != null){
-            if(intent.action!!.equals(ACTION_INIT)){
+            if (intent.action!! == ACTION_INIT) {
                 EventBus.getDefault().register(this)
                 schedule()
-            }
-            else if(intent.action!!.equals(ACTION_ON_BREAK_ALARM)){
+            } else if (intent.action!! == ACTION_ON_BREAK_ALARM) {
                 FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentries")
                         .orderByChild(LogEntry::timestamp.name).limitToLast(1)
                         .addListenerForSingleValueEvent(object : ValueEventListener {
                             override fun onCancelled(p0: DatabaseError?) {}
                             override fun onDataChange(p0: DataSnapshot?) {
-                                var logEntries = p0?.getValue(object : GenericTypeIndicator<HashMap<@kotlin.jvm.JvmSuppressWildcards String, @kotlin.jvm.JvmSuppressWildcards LogEntry>>() {})?.values?.toList()
+                                val logEntries = p0?.getValue(object : GenericTypeIndicator<HashMap<@kotlin.jvm.JvmSuppressWildcards String, @kotlin.jvm.JvmSuppressWildcards LogEntry>>() {})?.values?.toList()
                                 if (logEntries != null) {
-                                    var latestLog = logEntries.sortedBy { it.timestamp }.last()
-                                    if (latestLog != null && latestLog.entered) {
-                                        var today = MutableDateTime()
+                                    val latestLog = logEntries.sortedBy { it.timestamp }.last()
+                                    if (latestLog.entered) {
+                                        val today = MutableDateTime()
                                         today.millisOfDay = getSetting().automaticBreakStart.toInt()
-                                        var triggerTime = today.millis
-                                        var enterBreakLog = LogEntry(triggerTime, false, latestLog.projectId, latestLog.projectTitle)
+                                        val triggerTime = today.millis
+                                        val enterBreakLog = LogEntry(triggerTime, false, latestLog.projectId, latestLog.projectTitle)
                                         val automaticBreakDuration = getSetting().automaticBreakDuration
                                         today.millis = triggerTime + automaticBreakDuration
-                                        var exitBreakLog = LogEntry(today.millis, true, latestLog.projectId, latestLog.projectTitle)
-                                        var dbRef = FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentries")
+                                        val exitBreakLog = LogEntry(today.millis, true, latestLog.projectId, latestLog.projectTitle)
+                                        val dbRef = FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentries")
                                         dbRef.child(enterBreakLog.id).setValue(enterBreakLog)
                                         dbRef.child(exitBreakLog.id).setValue(exitBreakLog)
                                     }
