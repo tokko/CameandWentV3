@@ -254,6 +254,14 @@ class ProjectEditFragment : Fragment(){
             pickSSID()
         }
 
+        override fun onStop() {
+            super.onStop()
+            if (receiver != null)
+                activity.unregisterReceiver(receiver)
+        }
+
+        private var receiver: BroadcastReceiver? = null
+
         private fun pickSSID() {
             val wm = activity.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
             if (ContextCompat.checkSelfPermission(activity, Manifest.permission.CHANGE_WIFI_STATE) != PackageManager.PERMISSION_GRANTED
@@ -274,15 +282,18 @@ class ProjectEditFragment : Fragment(){
                 wm.isWifiEnabled = true
                 Toast.makeText(activity.applicationContext, "Wifi is disabled. Enabling...", Toast.LENGTH_SHORT).show()
             }
-            activity.registerReceiver(object : BroadcastReceiver() {
-                override fun onReceive(context: Context?, intent: Intent?) {
-                    val scanResults = wm.scanResults
-                    val elements = scanResults.stream().map { x -> x.SSID }.collect(Collectors.toList())
-                    ssids.clear()
-                    ssids.addAll(elements)
-                    adapter!!.notifyDataSetChanged()
+            if (receiver == null) {
+                receiver = object : BroadcastReceiver() {
+                    override fun onReceive(context: Context?, intent: Intent?) {
+                        val scanResults = wm.scanResults
+                        val elements = scanResults.stream().map { x -> x.SSID }.collect(Collectors.toList())
+                        ssids.clear()
+                        ssids.addAll(elements)
+                        adapter!!.notifyDataSetChanged()
+                    }
                 }
-            }, IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION))
+                activity.registerReceiver(receiver, IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION))
+            }
             wm.startScan()
         }
 
