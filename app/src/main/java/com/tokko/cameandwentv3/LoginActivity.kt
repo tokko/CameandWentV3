@@ -74,7 +74,8 @@ class LoginActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedList
                                 // Sign in success, update UI with the signed-in user's information
                                 Log.d("Auth", "signInWithCredential:success")
                                 initPostLogin()
-                                startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+                                if (intent != null && !intent.getBooleanExtra("skipresume", false))
+                                    startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                                 finish()
                             } else {
                                 // If sign in fails, display a message to the user.
