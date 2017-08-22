@@ -86,7 +86,7 @@ class GeofenceService : IntentService("GeofenceService"), GoogleApiClient.Connec
                                     Geofence.Builder()
                                             .setRequestId(p.id + ":" + l.id + ":" + p.title)
                                             .setCircularRegion(l.latitude, l.longitude, 100F)
-                                            .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER + Geofence.GEOFENCE_TRANSITION_EXIT)
+                                            .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER + Geofence.GEOFENCE_TRANSITION_EXIT + Geofence.GEOFENCE_TRANSITION_DWELL)
                                             .setExpirationDuration(Geofence.NEVER_EXPIRE)
                                             .setLoiteringDelay(1000*60*5)
                                             .build()
