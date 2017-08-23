@@ -54,7 +54,7 @@ class CountdownNotificationService: Service(){
                             if (logEntries != null) {
                                 if (logEntries.last().entered) {
                                     val today = DateTime(System.currentTimeMillis()).withTimeAtStartOfDay().millis
-                                    entriesToday = logEntries.takeLastWhile { it.timestamp > today }
+                                    entriesToday = logEntries.takeLastWhile { it.timestamp >= today }
                                     updateNotification(nm)
                                     registerScreenReceiver()
                                     registerTickReceiver()
@@ -114,10 +114,16 @@ class CountdownNotificationService: Service(){
     }
     private fun updateNotification(nmp: NotificationManager? = null) {
         val nm = nmp ?: getSystemService(NotificationManager::class.java)
-        var duration = Math.abs(entriesToday!!.fold(-Math.max(System.currentTimeMillis(), entriesToday!!.last().timestamp), { a, x -> a + if (x.entered) x.timestamp else -x.timestamp }))
+        var duration = this.entriesToday!!.fold(0L) { a, x -> a + if (x.entered) x.timestamp else -x.timestamp }
+        if (entriesToday!!.size % 2 != 0) duration -= System.currentTimeMillis()
+        duration = Math.abs(duration)
+        //val duration = Math.abs(entriesToday!!.fold(-Math.max(System.currentTimeMillis(), entriesToday!!.last().timestamp), { a, x -> a + if (x.entered) x.timestamp else -x.timestamp }))
         //  if(entriesToday!!.last().timestamp < System.currentTimeMillis())
         //      duration = duration?.minus(System.currentTimeMillis()) ?: 0L
-        val max = 8 * 60 * 60 * 1000 + getSetting().automaticBreakDuration
+        val max = 8 * 60 * 60 * 1000// + getSetting().automaticBreakDuration
+        val durationS = duration.toHourMinute()
+        val maxS = max.toLong().toHourMinute()
+        val diffS = (max - duration).toHourMinute()
         val builder = NotificationCompat.Builder(applicationContext, Notification.CATEGORY_MESSAGE)
         builder.mContentTitle = ""
         builder.mContentText = "Time remaining: " + (max - duration).toHourMinute()

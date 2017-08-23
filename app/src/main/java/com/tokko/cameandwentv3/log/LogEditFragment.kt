@@ -96,7 +96,6 @@ class LogEditFragment: Fragment() {
             val project = adapter!!.getItem(project_picker.selectedItemPosition)
             logEntry!!.projectId = project.id
             logEntry!!.projectTitle = project.title
-            logEntry!!.entered = true
             val dbRef = FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentries")
             dbRef.child(logEntry!!.id).setValue(logEntry)
             if(endTimestamp != 0L){
