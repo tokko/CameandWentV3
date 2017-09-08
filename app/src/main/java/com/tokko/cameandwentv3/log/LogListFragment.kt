@@ -80,7 +80,13 @@ class LogListFragment: Fragment() {
             }
             else{
                 val item = adapter!!.getGroup(adapter!!.groupCount - 1).logs.toList().sortedBy { x -> x.timestamp }.last()
-                clockin(item.projectId, item.projectTitle, false)
+                if(item.timestamp > System.currentTimeMillis()){
+                    item.timestamp = System.currentTimeMillis()
+                    item.entered = false
+                    FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentries").child(item.id).setValue(item)
+                }
+                else
+                    clock(item.projectId, item.projectTitle, false)
             }
         }
         loglist.setOnChildClickListener { _, _, groupPosition, childPosition, _ ->
@@ -100,18 +106,16 @@ class LogListFragment: Fragment() {
 
     }
 
-    private fun clockin(projectId: String, projectTitle: String, action: Boolean){
+    private fun clock(projectId: String, projectTitle: String, action: Boolean){
         val logEntry = LogEntry(System.currentTimeMillis(), action,projectId, projectTitle)
         FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentries").child(logEntry.id).setValue(logEntry)
-      //  adapter!!.add(LogEntry(System.currentTimeMillis(), action,projectId, projectTitle))
-      // adapter!!.notifyDataSetChanged()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when(requestCode){
             0 -> {
                 val p = data!!.getSerializableExtra("project") as Project
-                clockin(p.id, p.title, clock_button.isChecked)
+                clock(p.id, p.title, clock_button.isChecked)
             }
         }
         super.onActivityResult(requestCode, resultCode, data)
