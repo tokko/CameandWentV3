@@ -126,7 +126,7 @@ class CountdownNotificationService: Service(){
         builder.mContentText = "Time remaining: " + (max - duration).toHourMinute()
         builder.setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
         builder.setOngoing(true)
-        builder.setProgress(max.toInt(), duration.toInt(), false)
+        builder.setProgress(max, duration.toInt(), false)
         builder.setContentIntent(PendingIntent.getActivity(applicationContext, 0, Intent(applicationContext, MainActivity::class.java), 0))
 
         builder.addAction(
