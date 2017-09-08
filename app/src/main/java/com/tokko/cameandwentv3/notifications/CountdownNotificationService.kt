@@ -121,9 +121,6 @@ class CountdownNotificationService: Service(){
         //  if(entriesToday!!.last().timestamp < System.currentTimeMillis())
         //      duration = duration?.minus(System.currentTimeMillis()) ?: 0L
         val max = 8 * 60 * 60 * 1000// + getSetting().automaticBreakDuration
-        val durationS = duration.toHourMinute()
-        val maxS = max.toLong().toHourMinute()
-        val diffS = (max - duration).toHourMinute()
         val builder = NotificationCompat.Builder(applicationContext, Notification.CATEGORY_MESSAGE)
         builder.mContentTitle = ""
         builder.mContentText = "Time remaining: " + (max - duration).toHourMinute()
