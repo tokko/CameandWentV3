@@ -124,13 +124,13 @@ class CountdownNotificationService: Service(){
         val builder = NotificationCompat.Builder(applicationContext, Notification.CATEGORY_MESSAGE)
         builder.mContentTitle = ""
         builder.mContentText = "Time remaining: " + (max - duration).toHourMinute()
-        builder.setSmallIcon(R.drawable.ic_dialog_alert)
+        builder.setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
         builder.setOngoing(true)
         builder.setProgress(max.toInt(), duration.toInt(), false)
         builder.setContentIntent(PendingIntent.getActivity(applicationContext, 0, Intent(applicationContext, MainActivity::class.java), 0))
 
         builder.addAction(
-                android.R.drawable.ic_dialog_alert,
+                android.R.drawable.ic_lock_idle_alarm,
                 "Punch out",
                 PendingIntent.getService(applicationContext,
                         0,
