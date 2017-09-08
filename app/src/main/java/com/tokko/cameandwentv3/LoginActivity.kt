@@ -21,6 +21,7 @@ import com.tokko.cameandwentv3.automaticbreaks.AutomaticBreakService
 import com.tokko.cameandwentv3.geofence.GeofenceService
 import com.tokko.cameandwentv3.model.LogEntry
 import com.tokko.cameandwentv3.model.Setting
+import com.tokko.cameandwentv3.notifications.ClockoutNotification
 import com.tokko.cameandwentv3.notifications.CountdownNotificationService
 import com.tokko.cameandwentv3.settings.setSetting
 import com.tokko.cameandwentv3.wifi.WifiReceiver
@@ -92,7 +93,7 @@ class LoginActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedList
         }
     }
     private fun setupSoundToggling() {
-        FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentries").addValueEventListener(object : ValueEventListener {
+        FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentries").orderByChild("timestamp").limitToLast(1).addValueEventListener(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError?) {}
             override fun onDataChange(p0: DataSnapshot?) {
                 val logEntries = p0?.getValue(object : GenericTypeIndicator<HashMap<@kotlin.jvm.JvmSuppressWildcards String, @kotlin.jvm.JvmSuppressWildcards LogEntry>>() {})?.values?.toList()
@@ -115,7 +116,8 @@ class LoginActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedList
         setupSoundToggling()
         CountdownNotificationService.initialize(applicationContext)
         setupSettingSync()
-        AutomaticBreakService.initialize(this)
+        AutomaticBreakService.initialize(applicationContext)
+        ClockoutNotification.initialize(applicationContext)
     }
 
     private fun setupSettingSync() {
