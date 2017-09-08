@@ -26,3 +26,4 @@
 
 -dontwarn org.joda.convert.**
 -keep public class com.tokko.cameandwentv3.model** {*;}
+-keep public class org.greenrobot** {*;}

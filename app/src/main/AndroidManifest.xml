@@ -35,6 +35,7 @@
         <service android:name=".projects.GeocodingService" />
         <service android:name=".notifications.CountdownNotificationService" />
         <service android:name=".automaticbreaks.AutomaticBreakService" />
+        <service android:name=".notifications.ClockoutNotification" />
 
         <receiver android:name=".wifi.WifiReceiver">
             <intent-filter>

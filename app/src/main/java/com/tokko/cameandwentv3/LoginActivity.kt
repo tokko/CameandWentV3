@@ -87,6 +87,7 @@ class LoginActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedList
 
             } else {
                 Toast.makeText(this, "Login failed", Toast.LENGTH_SHORT).show()
+                finish()
             }
         }
     }

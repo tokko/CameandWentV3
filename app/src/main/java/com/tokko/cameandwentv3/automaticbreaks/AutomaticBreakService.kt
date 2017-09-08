@@ -58,7 +58,7 @@ class AutomaticBreakService : IntentService("AutomaticBreakService") {
             if (intent.action!! == ACTION_INIT) {
                 EventBus.getDefault().register(this)
                 schedule()
-            } else if (intent.action!! == ACTION_ON_BREAK_ALARM) {
+            } else if (intent.action!! == ACTION_ON_BREAK_ALARM ) {
                 FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentries")
                         .orderByChild(LogEntry::timestamp.name).limitToLast(1)
                         .addListenerForSingleValueEvent(object : ValueEventListener {
