@@ -6,6 +6,7 @@ import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.NotificationCompat
 import android.support.v4.content.ContextCompat
@@ -96,13 +97,17 @@ class GeofenceService : IntentService("GeofenceService"), GoogleApiClient.Connec
                             val request = GeofencingRequest.Builder().setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER).addGeofences(geofences).build()
                             if (ContextCompat.checkSelfPermission(this@GeofenceService, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
                                     || ContextCompat.checkSelfPermission(this@GeofenceService, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                                val notification = NotificationCompat.Builder(this@GeofenceService, NotificationChannel.DEFAULT_CHANNEL_ID)
-                                        .setContentTitle("Requires more permissions")
-                                        .setContentText("This app require permissions to access your location")
-                                        .setSmallIcon(R.drawable.stat_sys_warning)
-                                        .setContentIntent(PendingIntent.getActivity(this@GeofenceService, 0, Intent(this@GeofenceService, PermissionActivity::class.java), 0))
-                                        .setAutoCancel(true)
-                                        .build()
+                                var builder: NotificationCompat.Builder? = null
+                                builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                                                NotificationCompat.Builder(this@GeofenceService, NotificationChannel.DEFAULT_CHANNEL_ID)
+                                        else
+                                            NotificationCompat.Builder(this@GeofenceService)
+                                val notification = builder.setContentTitle("Requires more permissions")
+                                            .setContentText("This app require permissions to access your location")
+                                            .setSmallIcon(R.drawable.stat_sys_warning)
+                                            .setContentIntent(PendingIntent.getActivity(this@GeofenceService, 0, Intent(this@GeofenceService, PermissionActivity::class.java), 0))
+                                            .setAutoCancel(true)
+                                            .build()
                                 (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).notify(0, notification)
                                 return
                             }
