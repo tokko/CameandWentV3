@@ -24,8 +24,8 @@ class ProjectActivity : Activity() {
     }
 
     override fun onStop() {
-        super.onStop()
         EventBus.getDefault().unregister(this)
+        super.onStop()
     }
 
     @Subscribe
