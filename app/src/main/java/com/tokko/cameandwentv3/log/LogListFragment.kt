@@ -37,7 +37,7 @@ class LogListFragment: Fragment() {
         loglist.emptyView = list_empty
         listener = object: ValueEventListener{
             override fun onDataChange(p0: DataSnapshot?) {
-                var logEntries = p0?.getValue(object: GenericTypeIndicator<HashMap<@kotlin.jvm.JvmSuppressWildcards String, @kotlin.jvm.JvmSuppressWildcards LogEntry>>(){ })?.values?.toList()
+                val logEntries = p0?.getValue(object: GenericTypeIndicator<HashMap<@kotlin.jvm.JvmSuppressWildcards String, @kotlin.jvm.JvmSuppressWildcards LogEntry>>(){ })?.values?.toList()
                 if(logEntries != null){
                     //cleaning data
 

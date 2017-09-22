@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit
 /**
  * Created by andreas on 6/07/17.
  */
-class Duration(logs: Collection<LogEntry>, val consultRounding: Boolean, val clean: Boolean = false) {
+class Duration(logs: Collection<LogEntry>, private val consultRounding: Boolean, clean: Boolean = false) {
     var duration: String = ""
     get() {
         var duration = this.logs.fold(0L) { a, x -> a + if(x.entered) x.timestamp else -x.timestamp }
@@ -20,7 +20,7 @@ class Duration(logs: Collection<LogEntry>, val consultRounding: Boolean, val cle
     var logs: ArrayList<LogEntry> = ArrayList(logs.sortedBy { it.timestamp })
     var date: String = ""
         get() = SimpleDateFormat("yyyy-MM-dd").format(Date(logs.first().timestamp))
-    val millisIn30Minutes = 30*60*1000
+    private val millisIn30Minutes = 30*60*1000
 
     init{
         if(clean)
