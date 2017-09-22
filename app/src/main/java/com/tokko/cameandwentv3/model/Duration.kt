@@ -10,12 +10,17 @@ import java.util.concurrent.TimeUnit
 class Duration(logs: Collection<LogEntry>, private val consultRounding: Boolean, clean: Boolean = false) {
     var duration: String = ""
     get() {
+
+        return durationLong.toHourMinuteSeconds()
+    }
+    var durationLong: Long = 0L
+    get(){
         var duration = this.logs.fold(0L) { a, x -> a + if(x.entered) x.timestamp else -x.timestamp }
         if(logs.size%2 != 0) duration -= System.currentTimeMillis()
         duration = Math.abs(duration)
         if(consultRounding)
             duration = (((duration+millisIn30Minutes)/millisIn30Minutes)*millisIn30Minutes)
-        return duration.toHourMinuteSeconds()
+        return duration
     }
     var logs: ArrayList<LogEntry> = ArrayList(logs.sortedBy { it.timestamp })
     var date: String = ""

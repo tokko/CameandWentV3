@@ -13,11 +13,13 @@ import android.support.v4.app.NotificationCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.tokko.cameandwentv3.MainActivity
+import com.tokko.cameandwentv3.model.Duration
 import com.tokko.cameandwentv3.model.LogEntry
 import com.tokko.cameandwentv3.model.toHourMinute
 import com.tokko.cameandwentv3.settings.getSetting
 import org.joda.time.DateTime
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 
 /**
@@ -114,8 +116,10 @@ class CountdownNotificationService: Service(){
     }
     private fun updateNotification(nmp: NotificationManager? = null) {
         val nm = nmp ?: getSystemService(NotificationManager::class.java)
-        var duration = this.entriesToday!!.fold(0L) { a, x -> a + if (x.entered) x.timestamp else -x.timestamp }
-        if (entriesToday!!.size % 2 != 0) duration -= System.currentTimeMillis()
+        //var duration = this.entriesToday!!.fold(0L) { a, x -> a + if (x.entered) x.timestamp else -x.timestamp }
+        val dur = Duration(entriesToday!!, getSetting().consultRounding, true)
+        var duration = dur.durationLong
+        if (dur.logs.size % 2 != 0) duration -= System.currentTimeMillis()
         duration = Math.abs(duration)
         //val duration = Math.abs(entriesToday!!.fold(-Math.max(System.currentTimeMillis(), entriesToday!!.last().timestamp), { a, x -> a + if (x.entered) x.timestamp else -x.timestamp }))
         //  if(entriesToday!!.last().timestamp < System.currentTimeMillis())
@@ -124,13 +128,13 @@ class CountdownNotificationService: Service(){
         val builder = NotificationCompat.Builder(applicationContext, Notification.CATEGORY_MESSAGE)
         builder.mContentTitle = ""
         builder.mContentText = "Time remaining: " + (max - duration).toHourMinute()
-        builder.setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
+        builder.setSmallIcon(R.drawable.ic_lock_idle_alarm)
         builder.setOngoing(true)
         builder.setProgress(max, duration.toInt(), false)
         builder.setContentIntent(PendingIntent.getActivity(applicationContext, 0, Intent(applicationContext, MainActivity::class.java), 0))
 
         builder.addAction(
-                android.R.drawable.ic_lock_idle_alarm,
+                R.drawable.ic_lock_idle_alarm,
                 "Punch out",
                 PendingIntent.getService(applicationContext,
                         0,
@@ -139,6 +143,4 @@ class CountdownNotificationService: Service(){
         val notification = builder.build()
         nm.notify(0, notification)
     }
-
-
 }
