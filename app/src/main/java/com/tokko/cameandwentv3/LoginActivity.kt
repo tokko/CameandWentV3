@@ -1,5 +1,6 @@
 package com.tokko.cameandwentv3
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -26,6 +27,7 @@ import com.tokko.cameandwentv3.notifications.CountdownNotificationService
 import com.tokko.cameandwentv3.settings.setSetting
 import com.tokko.cameandwentv3.wifi.WifiReceiver
 import java.util.*
+
 
 /**
  * A login screen that offers login via email/password.
@@ -90,9 +92,13 @@ class LoginActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedList
                 Toast.makeText(this, "Login failed", Toast.LENGTH_SHORT).show()
                 finish()
             }
+        } else if (requestCode == 1) {
+            if (resultCode == Activity.RESULT_OK)
+                setupSoundToggling()
         }
     }
     private fun setupSoundToggling() {
+
         FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentries").orderByChild("timestamp").limitToLast(1).addValueEventListener(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError?) {}
             override fun onDataChange(p0: DataSnapshot?) {
@@ -110,6 +116,7 @@ class LoginActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedList
             }
         })
     }
+
     private fun initPostLogin() {
         GeofenceService.initGeofences(applicationContext)
         applicationContext.registerReceiver(WifiReceiver(), IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
