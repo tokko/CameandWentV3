@@ -7,9 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.tokko.cameandwentv3.events.EventEditProject
+import com.tokko.cameandwentv3.getDbRef
 import com.tokko.cameandwentv3.model.Project
 import kotlinx.android.synthetic.main.project_fragment.*
 import org.greenrobot.eventbus.EventBus
@@ -20,9 +20,7 @@ class ProjectFragment : ListFragment() {
     var listener : ValueEventListener? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var uid = FirebaseAuth.getInstance().currentUser?.uid
-        var database = FirebaseDatabase.getInstance()
-        myRef = database.reference.child(uid).child("projects")
+        myRef = getDbRef().child("projects")
         listener = object : ValueEventListener {
            override fun onDataChange(p0: DataSnapshot?) {
                val projects = p0?.getValue(object: GenericTypeIndicator<HashMap<@kotlin.jvm.JvmSuppressWildcards String, @kotlin.jvm.JvmSuppressWildcards Project>>(){ })

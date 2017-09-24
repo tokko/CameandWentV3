@@ -47,7 +47,7 @@ class WifiService : Service() {
 
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        getDbRef().child("logentry").addListenerForSingleValueEvent(object : ValueEventListener {
+        getDbRef().child("logentries").addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onCancelled(p1: DatabaseError?) {}
             override fun onDataChange(p1: DataSnapshot?) {
                 val logEntries = p1?.getValue(object : GenericTypeIndicator<java.util.HashMap<@kotlin.jvm.JvmSuppressWildcards String, @kotlin.jvm.JvmSuppressWildcards LogEntry>>() {})?.values?.toList()
@@ -81,7 +81,7 @@ class WifiService : Service() {
 
             override fun onLocationChanged(location: Location?) {
                 if (location != null) {
-                    getDbRef().child("logentry").addListenerForSingleValueEvent(object : ValueEventListener {
+                    getDbRef().child("logentries").addListenerForSingleValueEvent(object : ValueEventListener {
                         override fun onCancelled(p1: DatabaseError?) {}
                         override fun onDataChange(p1: DataSnapshot?) {
                             val logEntries = p1?.getValue(object : GenericTypeIndicator<java.util.HashMap<@kotlin.jvm.JvmSuppressWildcards String, @kotlin.jvm.JvmSuppressWildcards LogEntry>>() {})?.values?.toList()
@@ -92,7 +92,7 @@ class WifiService : Service() {
                                     override fun onCancelled(p0: DatabaseError?) {}
 
                                     override fun onDataChange(p0: DataSnapshot?) {
-                                        val project = p0?.getValue(object : GenericTypeIndicator<java.util.HashMap<@kotlin.jvm.JvmSuppressWildcards String, @kotlin.jvm.JvmSuppressWildcards Project>>() {})?.values?.single()
+                                        val project = p0?.getValue(Project::class.java)
                                         if (project != null) {
                                             val distances = project.locations.map { asLocation(it.latitude, it.longitude) }.map { it.distanceTo(location) }
                                             val limit = 100 //TODO("Distance as setting")
@@ -103,7 +103,7 @@ class WifiService : Service() {
                                             val ssid = info.ssid.replace("\"", "")
                                             if (project.SSIDs.any { ssid == it }) stopSelf()
                                             val newEntry = LogEntry(System.currentTimeMillis(), false, logEntry.projectId, logEntry.projectTitle)
-                                            getDbRef().child(newEntry.id).setValue(newEntry)
+                                            getDbRef().child("logentries").child(newEntry.id).setValue(newEntry)
                                         }
                                     }
                                 })

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.net.wifi.WifiManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import com.tokko.cameandwentv3.getDbRef
 import com.tokko.cameandwentv3.model.LogEntry
 import com.tokko.cameandwentv3.model.Project
 
@@ -19,16 +20,15 @@ class WifiReceiver : BroadcastReceiver() {
         val wifiManager = context?.getSystemService(Context.WIFI_SERVICE) as WifiManager
         val info = wifiManager.connectionInfo
         val ssid = info.ssid.replace("\"", "")
-        val dbRef = FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid)
-        dbRef.child("projects")
+        if (ssid == noWifiSSID) {
+            context.attemptClockout()
+        }
+        getDbRef().child("projects")
                 .addValueEventListener(object : ValueEventListener {
                     override fun onDataChange(p0: DataSnapshot?) {
                         val projects = p0?.getValue(object : GenericTypeIndicator<HashMap<@JvmSuppressWildcards String, @JvmSuppressWildcards Project>>() {})?.values
                         if (projects != null) {
-                            if (ssid == noWifiSSID) {
-                                context.attemptClockout()
-                            } else {
-                                FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentry").addListenerForSingleValueEvent(object : ValueEventListener {
+                            getDbRef().child("logentry").addValueEventListener(object : ValueEventListener {
                                     override fun onCancelled(p1: DatabaseError?) {}
                                     override fun onDataChange(p1: DataSnapshot?) {
                                         val logEntries = p1?.getValue(object : GenericTypeIndicator<java.util.HashMap<@kotlin.jvm.JvmSuppressWildcards String, @kotlin.jvm.JvmSuppressWildcards LogEntry>>() {})?.values?.toList()
@@ -41,8 +41,6 @@ class WifiReceiver : BroadcastReceiver() {
                                         }
                                     }
                                 })
-
-                            }
                         } else {
 
                         }
