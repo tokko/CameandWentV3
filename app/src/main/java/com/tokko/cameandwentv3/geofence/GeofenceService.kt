@@ -2,7 +2,10 @@ package com.tokko.cameandwentv3.geofence
 
 import android.Manifest
 import android.R
-import android.app.*
+import android.app.IntentService
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -11,17 +14,18 @@ import android.os.Bundle
 import android.support.v4.app.NotificationCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
-import com.google.android.gms.location.*
+import com.google.android.gms.common.api.GoogleApiClient
+import com.google.android.gms.location.Geofence
+import com.google.android.gms.location.GeofencingEvent
+import com.google.android.gms.location.GeofencingRequest
+import com.google.android.gms.location.LocationServices
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.tokko.cameandwentv3.model.LogEntry
 import com.tokko.cameandwentv3.model.Project
 import com.tokko.cameandwentv3.util.PermissionActivity
+import com.tokko.cameandwentv3.wifi.attemptClockout
 import java.util.stream.Collectors
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.common.api.GoogleApiClient
-
-
 
 
 /**
@@ -51,8 +55,7 @@ class GeofenceService : IntentService("GeofenceService"), GoogleApiClient.Connec
             }
             val geofenceTransition = geofencingEvent.geofenceTransition
 
-            if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER ||
-                    geofenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT) {
+            if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER || geofenceTransition == Geofence.GEOFENCE_TRANSITION_DWELL) {
 
                 val triggeringGeofences = geofencingEvent.triggeringGeofences
                 val dbRef = FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentries")
@@ -60,6 +63,8 @@ class GeofenceService : IntentService("GeofenceService"), GoogleApiClient.Connec
                     val logEntry = LogEntry(System.currentTimeMillis(), geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER, g.requestId.split(":")[0], g.requestId.split(":")[2])
                     dbRef.child(logEntry.id).setValue(logEntry)
                 }
+            } else if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT) {
+                applicationContext.attemptClockout()
             }
         }
     }
@@ -86,7 +91,7 @@ class GeofenceService : IntentService("GeofenceService"), GoogleApiClient.Connec
                                 p.locations.stream().map { l ->
                                     Geofence.Builder()
                                             .setRequestId(p.id + ":" + l.id + ":" + p.title)
-                                            .setCircularRegion(l.latitude, l.longitude, 100F)
+                                            .setCircularRegion(l.latitude, l.longitude, 100F) //TODO("Distance as setting")
                                             .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER + Geofence.GEOFENCE_TRANSITION_EXIT + Geofence.GEOFENCE_TRANSITION_DWELL)
                                             .setExpirationDuration(Geofence.NEVER_EXPIRE)
                                             .setLoiteringDelay(1000*60*5)

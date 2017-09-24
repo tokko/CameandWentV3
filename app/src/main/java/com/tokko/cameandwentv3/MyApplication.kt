@@ -10,12 +10,10 @@ import java.util.*
 /**
  * Created by andre on 29/06/2017.
  */
-
+fun getDbRef(): DatabaseReference {
+    return FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid)
+}
 class MyApplication : Application() {
-    override fun onCreate() {
-        super.onCreate()
-
-    }
 
     private fun mockData() {
         val dbRef = FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentries")

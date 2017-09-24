@@ -1,32 +1,36 @@
 package com.tokko.cameandwentv3.wifi
 
+import android.annotation.SuppressLint
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.location.Criteria
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
+import android.net.wifi.WifiManager
+import android.os.Bundle
 import android.os.IBinder
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.*
+import android.os.Looper
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.GenericTypeIndicator
+import com.google.firebase.database.ValueEventListener
+import com.tokko.cameandwentv3.getDbRef
 import com.tokko.cameandwentv3.model.LogEntry
 import com.tokko.cameandwentv3.model.Project
 
 /**
  * Created by andre on 23/09/2017.
  */
-fun Context.onWifiConnected(ssid: String) {
-    this.startService(Intent(this, WifiService::class.java).setAction(WifiService.ACTION_WIFI_CONNECTED).putExtra(WifiService.EXTRA_SSID, ssid))
-}
-
-fun Context.onWifiDisconnected() {
-    this.startService(Intent(this, WifiService::class.java).setAction(WifiService.ACTION_WIFI_DISCONNECTED))
+fun Context.attemptClockout() {
+    this.startService(Intent(this, WifiService::class.java).setAction(WifiService.ACTION_ATTEMPT_CLOCKOUT))
 }
 
 class WifiService : Service() {
-    val noWifiSSID = "<unknown ssid>"
 
     companion object {
-        val ACTION_WIFI_CONNECTED = "com.tokko.cameandwentv3.wifi.wifiservice.ACTION_CONNECTED"
-        val ACTION_WIFI_DISCONNECTED = "com.tokko.cameandwentv3.wifi.wifiservice.ACTION_DISCONNECTED"
-        val EXTRA_SSID = "com.tokko.cameandwentv3.wifi.wifiservice.EXTRA_SSID"
+        val ACTION_ATTEMPT_CLOCKOUT = "com.tokko.cameandwentv3.wifi.wifiservice.ACTION_ATTEMPT_CLOCKOUT"
     }
 
     override fun onBind(p0: Intent?): IBinder {
@@ -34,63 +38,80 @@ class WifiService : Service() {
     }
 
 
+    private fun asLocation(latitude: Double, longitude: Double): Location {
+        val l = Location("")
+        l.longitude = longitude
+        l.latitude = latitude
+        return l
+    }
+
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val ssid = intent?.getStringExtra(EXTRA_SSID)
-        if (ssid == null || ssid == "") {
-            stopSelf()
-        }
-        val dbRef = FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid)
-        dbRef.child("projects")
-                .addValueEventListener(object : ValueEventListener {
-                    override fun onDataChange(p0: DataSnapshot?) {
-                        val projects = p0?.getValue(object : GenericTypeIndicator<HashMap<@JvmSuppressWildcards String, @JvmSuppressWildcards Project>>() {})?.values
-                        if (projects != null) {
-                            if (ssid == noWifiSSID) {
-                                clockoutLatestProject()
-                            } else {
-                                FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentry").addListenerForSingleValueEvent(object : ValueEventListener {
-                                    override fun onCancelled(p1: DatabaseError?) {}
-                                    override fun onDataChange(p1: DataSnapshot?) {
-                                        val logEntries = p1?.getValue(object : GenericTypeIndicator<java.util.HashMap<@kotlin.jvm.JvmSuppressWildcards String, @kotlin.jvm.JvmSuppressWildcards LogEntry>>() {})?.values?.toList()
-                                        if (logEntries != null && logEntries.sortedBy { it.timestamp }.last().entered) return
-                                        val project = projects.singleOrNull { p -> p.SSIDs.any { s -> s == ssid } }
-                                        if (project != null) {
-                                            val logEntry = LogEntry(System.currentTimeMillis(), true, project.id, project.title)
-                                            FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentries").child(logEntry.id)
-                                                    .setValue(logEntry)
-                                        }
-                                    }
-                                })
+        getDbRef().child("logentry").addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onCancelled(p1: DatabaseError?) {}
+            override fun onDataChange(p1: DataSnapshot?) {
+                val logEntries = p1?.getValue(object : GenericTypeIndicator<java.util.HashMap<@kotlin.jvm.JvmSuppressWildcards String, @kotlin.jvm.JvmSuppressWildcards LogEntry>>() {})?.values?.toList()
+                if (logEntries != null) {
+                    val logEntry = logEntries.sortedBy { it.timestamp }.last()
+                    if (!logEntry.entered) stopSelf()
 
-                            }
-                        } else {
-
-                        }
-                        stopSelf() //TODO("fix this later")
-                    }
-
-                    override fun onCancelled(p0: DatabaseError?) {
-                    }
-                })
+                }
+            }
+        })
+        getLocation()
         return START_STICKY
     }
 
-    private fun clockoutLatestProject() {
-        val dbRef = FirebaseDatabase.getInstance().reference.child(FirebaseAuth.getInstance().currentUser!!.uid).child("logentries")
-        dbRef.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(p0: DataSnapshot?) {
-                val entries = p0?.getValue(object : GenericTypeIndicator<HashMap<@JvmSuppressWildcards String, @JvmSuppressWildcards LogEntry>>() {})?.values
-                val latestEntry = entries?.sortedByDescending { x -> x.timestamp }?.first()
-                if (latestEntry != null) {
-                    val newEntry = LogEntry(System.currentTimeMillis(), false, latestEntry.projectId, latestEntry.projectTitle)
-                    dbRef.child(newEntry.id).setValue(newEntry)
+
+    @SuppressLint("MissingPermission")
+    private fun getLocation() {
+        val mLocationManager = applicationContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val criteria = Criteria()
+        criteria.accuracy = Criteria.ACCURACY_FINE
+        criteria.powerRequirement = Criteria.POWER_HIGH
+        mLocationManager.requestSingleUpdate(criteria, object : LocationListener {
+            override fun onStatusChanged(p0: String?, p1: Int, p2: Bundle?) {
+            }
+
+            override fun onProviderEnabled(p0: String?) {
+            }
+
+            override fun onProviderDisabled(p0: String?) {
+            }
+
+            override fun onLocationChanged(location: Location?) {
+                if (location != null) {
+                    getDbRef().child("logentry").addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onCancelled(p1: DatabaseError?) {}
+                        override fun onDataChange(p1: DataSnapshot?) {
+                            val logEntries = p1?.getValue(object : GenericTypeIndicator<java.util.HashMap<@kotlin.jvm.JvmSuppressWildcards String, @kotlin.jvm.JvmSuppressWildcards LogEntry>>() {})?.values?.toList()
+                            if (logEntries != null) {
+                                val logEntry = logEntries.sortedBy { it.timestamp }.last()
+                                if (!logEntry.entered) stopSelf()
+                                getDbRef().child("projects").child(logEntry.projectId).addListenerForSingleValueEvent(object : ValueEventListener {
+                                    override fun onCancelled(p0: DatabaseError?) {}
+
+                                    override fun onDataChange(p0: DataSnapshot?) {
+                                        val project = p0?.getValue(object : GenericTypeIndicator<java.util.HashMap<@kotlin.jvm.JvmSuppressWildcards String, @kotlin.jvm.JvmSuppressWildcards Project>>() {})?.values?.single()
+                                        if (project != null) {
+                                            val distances = project.locations.map { asLocation(it.latitude, it.longitude) }.map { it.distanceTo(location) }
+                                            val limit = 100 //TODO("Distance as setting")
+                                            if (distances.any { it < limit }) stopSelf()
+
+                                            val wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+                                            val info = wifiManager.connectionInfo
+                                            val ssid = info.ssid.replace("\"", "")
+                                            if (project.SSIDs.any { ssid == it }) stopSelf()
+                                            val newEntry = LogEntry(System.currentTimeMillis(), false, logEntry.projectId, logEntry.projectTitle)
+                                            getDbRef().child(newEntry.id).setValue(newEntry)
+                                        }
+                                    }
+                                })
+                            }
+                        }
+                    })
                 }
-
             }
-
-            override fun onCancelled(p0: DatabaseError?) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-        })
+        }, Looper.getMainLooper())
     }
 }
