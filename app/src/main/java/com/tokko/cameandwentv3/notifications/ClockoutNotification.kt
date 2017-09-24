@@ -4,13 +4,13 @@ import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import android.media.AudioManager
 import android.media.RingtoneManager
 import android.support.v4.app.NotificationCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import com.tokko.cameandwentv3.LoginActivity
 import com.tokko.cameandwentv3.model.LogEntry
-import java.util.HashMap
+import java.util.*
 
 /**
  * Created by andre on 8/09/2017.
@@ -40,7 +40,7 @@ class ClockoutNotification: IntentService(ClockoutNotification::class.java.canon
                     builder.setVibrate(longArrayOf(0, 1000))
                     builder.setLights(Color.MAGENTA, 3000, 3000)
                     builder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-
+                    builder.setContentIntent(PendingIntent.getActivity(applicationContext, 0, Intent(applicationContext, LoginActivity::class.java), 0))
                     builder.addAction(
                             android.R.drawable.ic_lock_idle_alarm,
                             "Punch back in",
