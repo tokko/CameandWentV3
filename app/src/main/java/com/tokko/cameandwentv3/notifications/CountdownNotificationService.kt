@@ -19,7 +19,6 @@ import com.tokko.cameandwentv3.model.toHourMinute
 import com.tokko.cameandwentv3.settings.getSetting
 import org.joda.time.DateTime
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 
 /**
@@ -119,7 +118,7 @@ class CountdownNotificationService: Service(){
         //var duration = this.entriesToday!!.fold(0L) { a, x -> a + if (x.entered) x.timestamp else -x.timestamp }
         val dur = Duration(entriesToday!!, getSetting().consultRounding, true)
         var duration = dur.durationLong
-        if (dur.logs.size % 2 != 0) duration -= System.currentTimeMillis()
+
         duration = Math.abs(duration)
         //val duration = Math.abs(entriesToday!!.fold(-Math.max(System.currentTimeMillis(), entriesToday!!.last().timestamp), { a, x -> a + if (x.entered) x.timestamp else -x.timestamp }))
         //  if(entriesToday!!.last().timestamp < System.currentTimeMillis())
