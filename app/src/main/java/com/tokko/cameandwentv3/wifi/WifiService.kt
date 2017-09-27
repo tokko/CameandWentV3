@@ -96,8 +96,7 @@ class WifiService : Service() {
                                         val project = p0?.getValue(Project::class.java)
                                         if (project != null) {
                                             val distances = project.locations.map { asLocation(it.latitude, it.longitude) }.map { it.distanceTo(location) }
-                                            val limit = getSetting().radius
-                                            if (distances.any { it < limit }) {
+                                            if (distances.any { it < getSetting().radius }) {
                                                 stopSelf()
                                                 return
                                             }
