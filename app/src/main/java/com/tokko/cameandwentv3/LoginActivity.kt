@@ -25,6 +25,7 @@ import com.tokko.cameandwentv3.model.Setting
 import com.tokko.cameandwentv3.notifications.ClockoutNotification
 import com.tokko.cameandwentv3.notifications.CountdownNotificationService
 import com.tokko.cameandwentv3.settings.setSetting
+import com.tokko.cameandwentv3.util.PermissionActivity
 import com.tokko.cameandwentv3.wifi.WifiReceiver
 import java.util.*
 
@@ -54,6 +55,7 @@ class LoginActivity : FragmentActivity(), GoogleApiClient.OnConnectionFailedList
         .build()
 
         signIn()
+        startActivity(Intent(this, PermissionActivity::class.java))
     }
 
     private fun signIn() {
