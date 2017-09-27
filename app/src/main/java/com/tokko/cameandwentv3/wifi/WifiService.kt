@@ -96,12 +96,18 @@ class WifiService : Service() {
                                         if (project != null) {
                                             val distances = project.locations.map { asLocation(it.latitude, it.longitude) }.map { it.distanceTo(location) }
                                             val limit = 100 //TODO("Distance as setting")
-                                            if (distances.any { it < limit }) stopSelf()
+                                            if (distances.any { it < limit }) {
+                                                stopSelf()
+                                                return
+                                            }
 
                                             val wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
                                             val info = wifiManager.connectionInfo
                                             val ssid = info.ssid.replace("\"", "")
-                                            if (project.SSIDs.any { ssid == it }) stopSelf()
+                                            if (project.SSIDs.any { ssid == it }){
+                                                stopSelf()
+                                                return
+                                            }
                                             val newEntry = LogEntry(System.currentTimeMillis(), false, logEntry.projectId, logEntry.projectTitle)
                                             getDbRef().child("logentries").child(newEntry.id).setValue(newEntry)
                                         }
