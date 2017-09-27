@@ -116,7 +116,7 @@ class CountdownNotificationService: Service(){
     private fun updateNotification(nmp: NotificationManager? = null) {
         val nm = nmp ?: getSystemService(NotificationManager::class.java)
         //var duration = this.entriesToday!!.fold(0L) { a, x -> a + if (x.entered) x.timestamp else -x.timestamp }
-        val dur = Duration(entriesToday!!, getSetting().consultRounding, true)
+        val dur = Duration(entriesToday!!, false, true)
         var duration = dur.durationLong
 
         duration = Math.abs(duration)
