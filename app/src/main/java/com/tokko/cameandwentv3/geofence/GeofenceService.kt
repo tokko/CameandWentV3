@@ -23,6 +23,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.tokko.cameandwentv3.model.LogEntry
 import com.tokko.cameandwentv3.model.Project
+import com.tokko.cameandwentv3.settings.getSetting
 import com.tokko.cameandwentv3.util.PermissionActivity
 import com.tokko.cameandwentv3.wifi.attemptClockout
 import java.util.stream.Collectors
@@ -91,7 +92,7 @@ class GeofenceService : IntentService("GeofenceService"), GoogleApiClient.Connec
                                 p.locations.stream().map { l ->
                                     Geofence.Builder()
                                             .setRequestId(p.id + ":" + l.id + ":" + p.title)
-                                            .setCircularRegion(l.latitude, l.longitude, 100F) //TODO("Distance as setting")
+                                            .setCircularRegion(l.latitude, l.longitude, getSetting().radius.toFloat())
                                             .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER + Geofence.GEOFENCE_TRANSITION_EXIT + Geofence.GEOFENCE_TRANSITION_DWELL)
                                             .setExpirationDuration(Geofence.NEVER_EXPIRE)
                                             .setLoiteringDelay(1000*60*5)

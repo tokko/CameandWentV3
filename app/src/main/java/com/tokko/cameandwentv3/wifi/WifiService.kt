@@ -19,6 +19,7 @@ import com.google.firebase.database.ValueEventListener
 import com.tokko.cameandwentv3.getDbRef
 import com.tokko.cameandwentv3.model.LogEntry
 import com.tokko.cameandwentv3.model.Project
+import com.tokko.cameandwentv3.settings.getSetting
 
 /**
  * Created by andre on 23/09/2017.
@@ -95,7 +96,7 @@ class WifiService : Service() {
                                         val project = p0?.getValue(Project::class.java)
                                         if (project != null) {
                                             val distances = project.locations.map { asLocation(it.latitude, it.longitude) }.map { it.distanceTo(location) }
-                                            val limit = 100 //TODO("Distance as setting")
+                                            val limit = getSetting().radius
                                             if (distances.any { it < limit }) {
                                                 stopSelf()
                                                 return
@@ -110,6 +111,7 @@ class WifiService : Service() {
                                             }
                                             val newEntry = LogEntry(System.currentTimeMillis(), false, logEntry.projectId, logEntry.projectTitle)
                                             getDbRef().child("logentries").child(newEntry.id).setValue(newEntry)
+                                            stopSelf()
                                         }
                                     }
                                 })
