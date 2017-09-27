@@ -22,7 +22,7 @@ class PermissionActivity: Activity() {
                 AlertDialog.Builder(this)
                         .setTitle("GPS permissions")
                         .setMessage("This permission is required to detect when you enter or leave your working area. Without it this app will basically be a digital punch clock.")
-                        .setPositiveButton("Ok") { dialog, _ -> ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_CONTACTS), 0); finish() }.show()
+                        .setPositiveButton("Ok") { _, _ -> ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_CONTACTS), 0); finish() }.show()
             } else {
                 ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_CONTACTS), 0)
             }
